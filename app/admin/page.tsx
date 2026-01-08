@@ -14,13 +14,24 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ThemeToggle } from "../components/ThemeToggle";
 
 export default function AdminOverview() {
-	const [lastViewedTimestamps, setLastViewedTimestamps] = useState<
-		Record<string, string>
-	>({});
+	const [lastViewedTimestamps] = useState<Record<string, string>>(() => {
+		// Load last viewed timestamps from localStorage on initial render only
+		if (typeof window !== "undefined") {
+			const stored = localStorage.getItem("admin_endpoint_last_viewed");
+			if (stored) {
+				try {
+					return JSON.parse(stored);
+				} catch (err) {
+					console.error("Failed to parse localStorage timestamps:", err);
+				}
+			}
+		}
+		return {};
+	});
 	const router = useRouter();
 
 	const {
@@ -30,19 +41,6 @@ export default function AdminOverview() {
 		error,
 		refetch,
 	} = useEndpointSummary();
-
-	useEffect(() => {
-		// Load last viewed timestamps from localStorage
-		const stored = localStorage.getItem("admin_endpoint_last_viewed");
-		if (stored) {
-			try {
-				// eslint-disable-next-line react-hooks/set-state-in-effect
-				setLastViewedTimestamps(JSON.parse(stored));
-			} catch (err) {
-				console.error("Failed to parse localStorage timestamps:", err);
-			}
-		}
-	}, []);
 
 	const handleRefresh = () => {
 		refetch();
