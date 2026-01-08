@@ -2,7 +2,7 @@
 
 import {
 	AlertCircle,
-	ChevronDown,
+	ArrowLeft,
 	Copy,
 	Eye,
 	EyeOff,
@@ -14,10 +14,9 @@ import {
 	Trash2,
 	Users,
 	Zap,
-	ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { ThemeToggle } from "../../components/ThemeToggle";
 import { deleteSubmission, getSubmissionsByEndpoint } from "../actions";
@@ -71,7 +70,10 @@ export default function AdminEndpointDashboard() {
 			}
 		}
 		timestamps[endpoint] = new Date().toISOString();
-		localStorage.setItem("admin_endpoint_last_viewed", JSON.stringify(timestamps));
+		localStorage.setItem(
+			"admin_endpoint_last_viewed",
+			JSON.stringify(timestamps)
+		);
 	}, [fetchSubmissionsData, endpoint]);
 
 	const handleRefresh = () => {
@@ -345,10 +347,18 @@ export default function AdminEndpointDashboard() {
 										</th>
 										{(() => {
 											const dataKeys = Array.from(
-												new Set(filteredSubmissions.flatMap((s) => Object.keys(s.data || {})))
+												new Set(
+													filteredSubmissions.flatMap((s) =>
+														Object.keys(s.data || {})
+													)
+												)
 											);
 											const browserKeys = Array.from(
-												new Set(filteredSubmissions.flatMap((s) => Object.keys(s.browser_info || {})))
+												new Set(
+													filteredSubmissions.flatMap((s) =>
+														Object.keys(s.browser_info || {})
+													)
+												)
 											);
 
 											return (
@@ -381,10 +391,18 @@ export default function AdminEndpointDashboard() {
 								<tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800">
 									{(() => {
 										const dataKeys = Array.from(
-											new Set(filteredSubmissions.flatMap((s) => Object.keys(s.data || {})))
+											new Set(
+												filteredSubmissions.flatMap((s) =>
+													Object.keys(s.data || {})
+												)
+											)
 										);
 										const browserKeys = Array.from(
-											new Set(filteredSubmissions.flatMap((s) => Object.keys(s.browser_info || {})))
+											new Set(
+												filteredSubmissions.flatMap((s) =>
+													Object.keys(s.browser_info || {})
+												)
+											)
 										);
 
 										return filteredSubmissions.map((sub) => (
@@ -465,7 +483,8 @@ export default function AdminEndpointDashboard() {
 						</div>
 						<div className="bg-gray-50/80 dark:bg-zinc-950/80 px-6 py-4 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">
 							<span>
-								Showing {filteredSubmissions.length} of {stats.total} total submissions
+								Showing {filteredSubmissions.length} of {stats.total} total
+								submissions
 							</span>
 							<span>End of data for {endpoint}</span>
 						</div>
