@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ThemeToggle } from "../../components/ThemeToggle";
+import { Layers } from "lucide-react";
 
 export default function AdminLogin() {
 	const [username, setUsername] = useState("");
@@ -38,19 +40,27 @@ export default function AdminLogin() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-			<div className="max-w-md w-full space-y-8">
+		<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+			<div className="absolute top-8 right-8">
+				<ThemeToggle />
+			</div>
+			<div className="max-w-md w-full space-y-8 bg-white dark:bg-zinc-900 p-10 rounded-3xl shadow-xl border border-gray-100 dark:border-zinc-800">
 				<div>
-					<h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+					<div className="flex justify-center">
+						<div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
+							<Layers className="w-8 h-8 text-white" />
+						</div>
+					</div>
+					<h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
 						Admin Login
 					</h2>
-					<p className="mt-2 text-center text-sm text-gray-600">
-						Sign in to access the admin panel
+					<p className="mt-2 text-center text-sm text-gray-600 dark:text-zinc-400 font-medium">
+						Sign in to access the Any-Form control panel
 					</p>
 				</div>
 				<form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-					<div className="rounded-md shadow-sm -space-y-px">
-						<div>
+					<div className="rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800">
+						<div className="relative">
 							<label htmlFor="username" className="sr-only">
 								Username
 							</label>
@@ -59,13 +69,13 @@ export default function AdminLogin() {
 								name="username"
 								type="text"
 								required
-								className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+								className="appearance-none relative block w-full px-4 py-3 border-b border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:z-10 sm:text-sm transition-colors"
 								placeholder="Username"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
 							/>
 						</div>
-						<div>
+						<div className="relative">
 							<label htmlFor="password" className="sr-only">
 								Password
 							</label>
@@ -74,7 +84,7 @@ export default function AdminLogin() {
 								name="password"
 								type="password"
 								required
-								className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+								className="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:z-10 sm:text-sm transition-colors"
 								placeholder="Password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
@@ -83,8 +93,10 @@ export default function AdminLogin() {
 					</div>
 
 					{error && (
-						<div className="rounded-md bg-red-50 p-4">
-							<div className="text-sm text-red-700">{error}</div>
+						<div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 p-4">
+							<div className="text-sm text-red-700 dark:text-red-400 font-medium text-center">
+								{error}
+							</div>
 						</div>
 					)}
 
@@ -92,9 +104,9 @@ export default function AdminLogin() {
 						<button
 							type="submit"
 							disabled={loading}
-							className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+							className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							{loading ? "Signing in..." : "Sign in"}
+							{loading ? "Signing in..." : "Sign in to Dashboard"}
 						</button>
 					</div>
 				</form>

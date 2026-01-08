@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { deleteSubmission, getSubmissions } from "./actions";
 
 interface Submission {
@@ -141,9 +142,9 @@ export default function AdminDashboard() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-				<RefreshCw className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-				<p className="text-gray-600 font-medium animate-pulse">
+			<div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
+				<RefreshCw className="w-12 h-12 text-indigo-600 dark:text-indigo-400 animate-spin mb-4" />
+				<p className="text-gray-600 dark:text-zinc-400 font-medium animate-pulse">
 					Loading Dashboard...
 				</p>
 			</div>
@@ -151,27 +152,27 @@ export default function AdminDashboard() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 pb-12">
+		<div className="min-h-screen bg-gray-50 dark:bg-zinc-950 pb-12 transition-colors duration-300">
 			{/* Header */}
-			<div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+			<div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm">
 				<div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex flex-col md:flex-row md:items-center justify-between py-4 gap-4">
 						<div className="flex items-center gap-4">
-							<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 shadow-lg">
+							<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg">
 								<LayoutDashboard className="w-6 h-6 text-white" />
 							</div>
 							<div>
-								<h1 className="text-xl font-bold text-gray-900 leading-tight">
+								<h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
 									Admin Dashboard
 								</h1>
-								<p className="text-xs text-gray-500 font-medium">
+								<p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
 									Any-Form Control Panel
 								</p>
 							</div>
 							<button
 								onClick={handleRefresh}
 								disabled={isPending}
-								className="ml-2 flex items-center gap-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100"
+								className="ml-2 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
 							>
 								<RefreshCw
 									className={`w-4 h-4 ${isPending ? "animate-spin" : ""}`}
@@ -190,17 +191,17 @@ export default function AdminDashboard() {
 									placeholder="Search submissions..."
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
-									className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
+									className="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-black focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
 								/>
 							</div>
 
-							<div className="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
+							<div className="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 border border-gray-200 dark:border-zinc-700">
 								<button
 									onClick={() => setShowBrowserInfo(!showBrowserInfo)}
 									className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
 										showBrowserInfo
-											? "bg-white text-indigo-600 shadow-sm"
-											: "text-gray-500 hover:text-gray-700"
+											? "bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+											: "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200"
 									}`}
 								>
 									{showBrowserInfo ? (
@@ -221,7 +222,7 @@ export default function AdminDashboard() {
 								<select
 									value={endpointFilter}
 									onChange={(e) => setEndpointFilter(e.target.value)}
-									className="appearance-none block w-full pl-3 pr-10 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 hover:bg-gray-100 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none cursor-pointer font-medium"
+									className="appearance-none block w-full pl-3 pr-10 py-2 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-900 focus:bg-white dark:focus:bg-black focus:ring-2 focus:ring-indigo-500 transition-all outline-none cursor-pointer font-medium"
 								>
 									{uniqueEndpoints.length === 0 && (
 										<option value="">No Endpoints</option>
@@ -237,9 +238,11 @@ export default function AdminDashboard() {
 								</div>
 							</div>
 
+							<ThemeToggle />
+
 							<button
 								onClick={handleLogout}
-								className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+								className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2 rounded-lg text-sm font-bold transition-all"
 							>
 								<LogOut className="w-4 h-4" />
 								Logout
@@ -252,37 +255,41 @@ export default function AdminDashboard() {
 			<div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{/* Stats Cards */}
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-shadow">
-						<div className="bg-indigo-50 p-3 rounded-xl group-hover:bg-indigo-100 transition-colors">
-							<Users className="w-6 h-6 text-indigo-600" />
+					<div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-4 group hover:shadow-md transition-shadow">
+						<div className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-xl group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
+							<Users className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
 						</div>
 						<div>
-							<p className="text-sm text-gray-500 font-medium">
+							<p className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
 								Total Submissions
 							</p>
-							<p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+							<p className="text-2xl font-bold text-gray-900 dark:text-white">
+								{stats.total}
+							</p>
 						</div>
 					</div>
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-shadow">
-						<div className="bg-green-50 p-3 rounded-xl group-hover:bg-green-100 transition-colors">
-							<Zap className="w-6 h-6 text-green-600" />
+					<div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-4 group hover:shadow-md transition-shadow">
+						<div className="bg-green-50 dark:bg-green-900/30 p-3 rounded-xl group-hover:bg-green-100 dark:group-hover:bg-green-900/50 transition-colors">
+							<Zap className="w-6 h-6 text-green-600 dark:text-green-400" />
 						</div>
 						<div>
-							<p className="text-sm text-gray-500 font-medium">
+							<p className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
 								Visible Results
 							</p>
-							<p className="text-2xl font-bold text-gray-900">
+							<p className="text-2xl font-bold text-gray-900 dark:text-white">
 								{stats.current}
 							</p>
 						</div>
 					</div>
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-shadow">
-						<div className="bg-amber-50 p-3 rounded-xl group-hover:bg-amber-100 transition-colors">
-							<Layers className="w-6 h-6 text-amber-600" />
+					<div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-4 group hover:shadow-md transition-shadow">
+						<div className="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50 transition-colors">
+							<Layers className="w-6 h-6 text-amber-600 dark:text-amber-400" />
 						</div>
 						<div>
-							<p className="text-sm text-gray-500 font-medium">Endpoints</p>
-							<p className="text-2xl font-bold text-gray-900">
+							<p className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
+								Endpoints
+							</p>
+							<p className="text-2xl font-bold text-gray-900 dark:text-white">
 								{stats.endpoints}
 							</p>
 						</div>
@@ -290,21 +297,23 @@ export default function AdminDashboard() {
 				</div>
 
 				{error && (
-					<div className="mb-6 bg-red-50 border border-red-100 rounded-xl p-4 flex items-center gap-3">
-						<AlertCircle className="w-5 h-5 text-red-500" />
-						<div className="text-sm font-medium text-red-700">{error}</div>
+					<div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-xl p-4 flex items-center gap-3">
+						<AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
+						<div className="text-sm font-medium text-red-700 dark:text-red-300">
+							{error}
+						</div>
 					</div>
 				)}
 
 				{Object.keys(groupedSubmissions).length === 0 ? (
-					<div className="bg-white rounded-3xl shadow-sm border border-gray-100 py-20 px-4 flex flex-col items-center justify-center text-center">
-						<div className="bg-gray-50 p-6 rounded-full mb-6">
-							<Inbox className="w-16 h-16 text-gray-300" />
+					<div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 py-20 px-4 flex flex-col items-center justify-center text-center">
+						<div className="bg-gray-50 dark:bg-zinc-950 p-6 rounded-full mb-6">
+							<Inbox className="w-16 h-16 text-gray-300 dark:text-zinc-700" />
 						</div>
-						<h3 className="text-xl font-bold text-gray-900 mb-2">
+						<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 							No Submissions Found
 						</h3>
-						<p className="text-gray-500 max-w-sm mb-8">
+						<p className="text-gray-500 dark:text-zinc-400 max-w-sm mb-8">
 							{searchQuery
 								? `We couldn't find anything matching "${searchQuery}" in this endpoint.`
 								: "Waiting for your first form submission for this endpoint."}
@@ -312,7 +321,7 @@ export default function AdminDashboard() {
 						{searchQuery && (
 							<button
 								onClick={() => setSearchQuery("")}
-								className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors px-4 py-2 bg-indigo-50 rounded-lg"
+								className="text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg"
 							>
 								Clear Search
 							</button>
@@ -332,31 +341,31 @@ export default function AdminDashboard() {
 								<div key={endpoint} className="space-y-6">
 									<div className="flex items-center justify-between">
 										<div className="flex items-center gap-3">
-											<div className="h-8 w-1 bg-indigo-600 rounded-full"></div>
-											<h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
+											<div className="h-8 w-1 bg-indigo-600 dark:bg-indigo-400 rounded-full"></div>
+											<h2 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
 												Endpoint:{" "}
-												<span className="text-indigo-600 uppercase">
+												<span className="text-indigo-600 dark:text-indigo-400 uppercase">
 													{endpoint}
 												</span>
 											</h2>
-											<span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+											<span className="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-100 dark:border-indigo-800">
 												{subs.length} items
 											</span>
 										</div>
 									</div>
 
-									<div className="bg-white shadow-xl shadow-gray-200/50 border border-gray-100 rounded-3xl overflow-hidden transition-all">
+									<div className="bg-white dark:bg-zinc-900 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800 rounded-3xl overflow-hidden transition-all">
 										<div className="overflow-x-auto">
-											<table className="min-w-full divide-y divide-gray-100 border-collapse">
-												<thead className="bg-gray-50/50">
+											<table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800 border-collapse">
+												<thead className="bg-gray-50/50 dark:bg-zinc-950/50">
 													<tr>
-														<th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest sticky left-0 bg-gray-50/90 backdrop-blur-sm z-20 border-r border-gray-100/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+														<th className="px-6 py-4 text-left text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky left-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-20 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
 															Timestamp
 														</th>
 														{dataKeys.map((key) => (
 															<th
 																key={`data-${key}`}
-																className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest border-r border-gray-100/30"
+																className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest border-r border-gray-100/30 dark:border-zinc-800/30"
 															>
 																{key}
 															</th>
@@ -365,30 +374,30 @@ export default function AdminDashboard() {
 															browserKeys.map((key) => (
 																<th
 																	key={`browser-${key}`}
-																	className="px-6 py-4 text-left text-xs font-bold text-indigo-400 uppercase tracking-widest italic bg-indigo-50/30 border-r border-gray-100/30"
+																	className="px-6 py-4 text-left text-xs font-bold text-indigo-400 dark:text-indigo-300 uppercase tracking-widest italic bg-indigo-50/30 dark:bg-indigo-900/10 border-r border-gray-100/30 dark:border-zinc-800/30"
 																>
 																	{key}
 																</th>
 															))}
-														<th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest sticky right-0 bg-gray-50/90 backdrop-blur-sm z-20 border-l border-gray-100 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
+														<th className="px-6 py-4 text-left text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky right-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-20 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
 															Actions
 														</th>
 													</tr>
 												</thead>
-												<tbody className="bg-white divide-y divide-gray-50">
+												<tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800">
 													{subs.map((sub) => (
 														<tr
 															key={sub.id}
-															className="group hover:bg-indigo-50/30 transition-all duration-200"
+															className="group hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all duration-200"
 														>
-															<td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500 sticky left-0 bg-white group-hover:bg-indigo-50/50 transition-colors z-10 border-r border-gray-100/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+															<td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500 dark:text-zinc-400 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-900/20 transition-colors z-10 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
 																<div className="flex flex-col">
 																	<span>
 																		{new Date(
 																			sub.created_at
 																		).toLocaleDateString()}
 																	</span>
-																	<span className="text-[10px] text-gray-400">
+																	<span className="text-[10px] text-gray-400 dark:text-zinc-500">
 																		{new Date(
 																			sub.created_at
 																		).toLocaleTimeString()}
@@ -398,20 +407,22 @@ export default function AdminDashboard() {
 															{dataKeys.map((key) => (
 																<td
 																	key={`${sub.id}-data-${key}`}
-																	className="px-6 py-5 text-sm text-gray-700 font-medium border-r border-gray-100/30 max-w-[300px] truncate"
+																	className="px-6 py-5 text-sm text-gray-700 dark:text-zinc-300 font-medium border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[300px] truncate"
 																	title={String(sub.data[key])}
 																>
 																	{sub.data[key] !== null &&
 																	sub.data[key] !== undefined ? (
 																		typeof sub.data[key] === "object" ? (
-																			<code className="text-xs bg-gray-50 p-1 rounded font-mono truncate block">
+																			<code className="text-xs bg-gray-50 dark:bg-zinc-800 p-1 rounded font-mono truncate block text-gray-600 dark:text-zinc-400">
 																				{JSON.stringify(sub.data[key])}
 																			</code>
 																		) : (
 																			String(sub.data[key])
 																		)
 																	) : (
-																		<span className="text-gray-300">—</span>
+																		<span className="text-gray-300 dark:text-zinc-700">
+																			—
+																		</span>
 																	)}
 																</td>
 															))}
@@ -419,27 +430,29 @@ export default function AdminDashboard() {
 																browserKeys.map((key) => (
 																	<td
 																		key={`${sub.id}-browser-${key}`}
-																		className="px-6 py-5 text-xs text-indigo-500 bg-indigo-50/10 group-hover:bg-indigo-50/30 transition-colors border-r border-gray-100/30 max-w-[200px] truncate"
+																		className="px-6 py-5 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50/10 dark:bg-indigo-900/5 group-hover:bg-indigo-50/30 dark:group-hover:bg-indigo-900/10 transition-colors border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[200px] truncate"
 																		title={String(sub.browser_info[key])}
 																	>
 																		{sub.browser_info[key] !== null &&
 																		sub.browser_info[key] !== undefined ? (
 																			String(sub.browser_info[key])
 																		) : (
-																			<span className="text-indigo-200">—</span>
+																			<span className="text-indigo-200 dark:text-indigo-900">
+																				—
+																			</span>
 																		)}
 																	</td>
 																))}
-															<td className="px-6 py-5 whitespace-nowrap sticky right-0 bg-white group-hover:bg-indigo-50/50 transition-colors z-10 border-l border-gray-100 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
+															<td className="px-6 py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-900/20 transition-colors z-10 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
 																<div className="flex items-center gap-3">
 																	{sub.ip_address && (
-																		<span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-mono font-bold">
+																		<span className="text-[10px] bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-mono font-bold">
 																			{sub.ip_address}
 																		</span>
 																	)}
 																	<button
 																		onClick={() => handleDelete(sub.id)}
-																		className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+																		className="p-2 text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
 																		title="Delete entry"
 																	>
 																		<Trash2 className="w-5 h-5" />
@@ -451,7 +464,7 @@ export default function AdminDashboard() {
 												</tbody>
 											</table>
 										</div>
-										<div className="bg-gray-50/80 px-6 py-4 border-t border-gray-100 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+										<div className="bg-gray-50/80 dark:bg-zinc-950/80 px-6 py-4 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">
 											<span>
 												Showing {subs.length} of {stats.total} total submissions
 											</span>
