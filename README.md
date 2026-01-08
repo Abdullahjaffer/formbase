@@ -2,7 +2,7 @@
 
 **Self-hostable.** Manage all your forms from different websites, apps, and services in **one single place**. FormBase is a lightweight, zero-config backend that lets you collect submissions from any source and view them in a beautiful, unified dashboard.
 
-![FormBase Dashboard](./public/Screenshot%202026-01-08%20at%205.34.17%20PM.png)
+![FormBase Dashboard](./public/app.png)
 
 ## Why FormBase?
 

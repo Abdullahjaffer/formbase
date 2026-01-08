@@ -204,7 +204,7 @@ export default function Home() {
 							</div>
 							<div className="p-4">
 								<Image
-									src="/Screenshot 2026-01-08 at 5.34.17 PM.png"
+									src="/app.png"
 									alt="FormBase Dashboard Preview"
 									width={1200}
 									height={800}
