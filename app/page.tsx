@@ -83,7 +83,7 @@ export default function Home() {
 							Go to Admin Panel
 						</Link>
 						<a
-							href="https://github.com/abdullah/formbase"
+							href="https://github.com/Abdullahjaffer/formbase"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="w-full sm:w-auto bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"

@@ -24,7 +24,7 @@ Since it's open-source and self-hostable, you own your data. Clone it, deploy it
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/formbase.git
+git clone https://github.com/Abdullahjaffer/formbase.git
 cd formbase
 ```
 
