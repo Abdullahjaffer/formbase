@@ -98,3 +98,25 @@ export async function getSubmissionsByEndpoint(endpoint: string) {
 		throw new Error("Failed to fetch submissions for endpoint");
 	}
 }
+
+export async function getSubmissionById(id: string) {
+	const session = await verifyAdminSession();
+	if (!session) {
+		throw new Error("Unauthorized");
+	}
+
+	try {
+		const submission = await prisma.submission.findUnique({
+			where: { id },
+		});
+
+		if (!submission) {
+			throw new Error("Submission not found");
+		}
+
+		return submission;
+	} catch (error) {
+		console.error("Error fetching submission:", error);
+		throw new Error("Failed to fetch submission");
+	}
+}

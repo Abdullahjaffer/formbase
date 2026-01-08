@@ -1,5 +1,6 @@
 "use client";
 
+import { useDeleteSubmission, useSubmissionById } from "@/lib/admin-hooks";
 import {
 	ArrowLeft,
 	Calendar,
@@ -13,50 +14,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { ThemeToggle } from "../../../components/ThemeToggle";
-import { deleteSubmission, getSubmissionsByEndpoint } from "../../actions";
-
-interface Submission {
-	id: string;
-	endpoint_name: string;
-	data: Record<string, unknown>;
-	browser_info: Record<string, unknown>;
-	created_at: Date;
-	ip_address: string | null;
-}
 
 export default function SubmissionDetailPage() {
-	const [submission, setSubmission] = useState<Submission | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState("");
 	const router = useRouter();
 	const params = useParams();
 	const endpoint = params.endpoint as string;
 	const id = params.id as string;
 
-	useEffect(() => {
-		const fetchSubmission = async () => {
-			try {
-				const data = await getSubmissionsByEndpoint(endpoint);
-				const submissions = data as unknown as Submission[];
-				const found = submissions.find((s) => s.id === id);
-				if (found) {
-					setSubmission(found);
-				} else {
-					setError("Submission not found");
-				}
-			} catch (err: unknown) {
-				const message =
-					err instanceof Error ? err.message : "Failed to fetch submission";
-				setError(message);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchSubmission();
-	}, [endpoint, id]);
+	const { data: submission, isLoading: loading, error } = useSubmissionById(id);
+	const deleteMutation = useDeleteSubmission();
 
 	const handleLogout = async () => {
 		try {
@@ -70,7 +37,7 @@ export default function SubmissionDetailPage() {
 	const handleDelete = async () => {
 		if (!confirm("Are you sure you want to delete this submission?")) return;
 		try {
-			await deleteSubmission(id);
+			await deleteMutation.mutateAsync(id);
 			router.push(`/admin/${endpoint}`);
 		} catch (err: unknown) {
 			const message =
@@ -145,7 +112,9 @@ export default function SubmissionDetailPage() {
 					<h2 className="text-xl font-bold text-red-700 dark:text-red-400 mb-2">
 						Error
 					</h2>
-					<p className="text-red-600 dark:text-red-300 mb-6">{error}</p>
+					<p className="text-red-600 dark:text-red-300 mb-6">
+						{error instanceof Error ? error.message : "Submission not found"}
+					</p>
 					<Link
 						href={`/admin/${endpoint}`}
 						className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
@@ -252,23 +221,31 @@ export default function SubmissionDetailPage() {
 							Form Data
 						</h2>
 						<div className="space-y-4">
-							{Object.entries(submission.data).length > 0 ? (
-								Object.entries(submission.data).map(([key, value]) => (
-									<div
-										key={key}
-										className="border-b border-gray-100 dark:border-zinc-800 pb-4 last:border-0 last:pb-0"
-									>
-										<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
-											{key}
-										</label>
-										<div className="text-sm">{renderValue(value)}</div>
-									</div>
-								))
-							) : (
-								<p className="text-gray-400 dark:text-zinc-600 italic">
-									No form data available
-								</p>
-							)}
+							{(() => {
+								const dataObj =
+									typeof submission.data === "object" &&
+									submission.data !== null
+										? (submission.data as Record<string, unknown>)
+										: {};
+								const entries = Object.entries(dataObj);
+								return entries.length > 0 ? (
+									entries.map(([key, value]) => (
+										<div
+											key={key}
+											className="border-b border-gray-100 dark:border-zinc-800 pb-4 last:border-0 last:pb-0"
+										>
+											<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
+												{key}
+											</label>
+											<div className="text-sm">{renderValue(value)}</div>
+										</div>
+									))
+								) : (
+									<p className="text-gray-400 dark:text-zinc-600 italic">
+										No form data available
+									</p>
+								);
+							})()}
 						</div>
 					</div>
 
@@ -279,23 +256,31 @@ export default function SubmissionDetailPage() {
 							Browser Information
 						</h2>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-							{Object.entries(submission.browser_info).length > 0 ? (
-								Object.entries(submission.browser_info).map(([key, value]) => (
-									<div
-										key={key}
-										className="bg-gray-50 dark:bg-zinc-950 rounded-lg p-4 border border-gray-100 dark:border-zinc-800"
-									>
-										<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
-											{key}
-										</label>
-										<div className="text-sm">{renderValue(value)}</div>
-									</div>
-								))
-							) : (
-								<p className="text-gray-400 dark:text-zinc-600 italic">
-									No browser information available
-								</p>
-							)}
+							{(() => {
+								const browserObj =
+									typeof submission.browser_info === "object" &&
+									submission.browser_info !== null
+										? (submission.browser_info as Record<string, unknown>)
+										: {};
+								const entries = Object.entries(browserObj);
+								return entries.length > 0 ? (
+									entries.map(([key, value]) => (
+										<div
+											key={key}
+											className="bg-gray-50 dark:bg-zinc-950 rounded-lg p-4 border border-gray-100 dark:border-zinc-800"
+										>
+											<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
+												{key}
+											</label>
+											<div className="text-sm">{renderValue(value)}</div>
+										</div>
+									))
+								) : (
+									<p className="text-gray-400 dark:text-zinc-600 italic">
+										No browser information available
+									</p>
+								);
+							})()}
 						</div>
 					</div>
 				</div>

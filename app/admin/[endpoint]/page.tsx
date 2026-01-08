@@ -1,6 +1,10 @@
 "use client";
 
 import {
+	useDeleteSubmission,
+	useSubmissionsByEndpoint,
+} from "@/lib/admin-hooks";
+import {
 	AlertCircle,
 	ArrowLeft,
 	Copy,
@@ -17,48 +21,26 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { ThemeToggle } from "../../components/ThemeToggle";
-import { deleteSubmission, getSubmissionsByEndpoint } from "../actions";
-
-interface Submission {
-	id: string;
-	endpoint_name: string;
-	data: Record<string, unknown>;
-	browser_info: Record<string, unknown>;
-	created_at: Date;
-	ip_address: string | null;
-}
 
 export default function AdminEndpointDashboard() {
-	const [submissions, setSubmissions] = useState<Submission[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState("");
-	const [isPending, startTransition] = useTransition();
 	const [showBrowserInfo, setShowBrowserInfo] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const router = useRouter();
 	const params = useParams();
 	const endpoint = params.endpoint as string;
 
-	const fetchSubmissionsData = useCallback(async () => {
-		try {
-			const data = await getSubmissionsByEndpoint(endpoint);
-			const fetchedSubmissions = data as unknown as Submission[];
-			setSubmissions(fetchedSubmissions);
-			setError("");
-		} catch (err: unknown) {
-			const message =
-				err instanceof Error ? err.message : "Failed to fetch submissions";
-			setError(message);
-		} finally {
-			setLoading(false);
-		}
-	}, [endpoint]);
+	const {
+		data: submissions = [],
+		isLoading: loading,
+		isFetching: isRefreshing,
+		error,
+		refetch,
+	} = useSubmissionsByEndpoint(endpoint);
+	const deleteMutation = useDeleteSubmission();
 
 	useEffect(() => {
-		fetchSubmissionsData();
-
 		// Update localStorage timestamp for this endpoint
 		const stored = localStorage.getItem("admin_endpoint_last_viewed");
 		let timestamps: Record<string, string> = {};
@@ -74,12 +56,10 @@ export default function AdminEndpointDashboard() {
 			"admin_endpoint_last_viewed",
 			JSON.stringify(timestamps)
 		);
-	}, [fetchSubmissionsData, endpoint]);
+	}, [endpoint]);
 
 	const handleRefresh = () => {
-		startTransition(async () => {
-			await fetchSubmissionsData();
-		});
+		refetch();
 	};
 
 	const handleLogout = async () => {
@@ -94,8 +74,7 @@ export default function AdminEndpointDashboard() {
 	const handleDelete = async (id: string) => {
 		if (!confirm("Are you sure you want to delete this submission?")) return;
 		try {
-			await deleteSubmission(id);
-			await fetchSubmissionsData();
+			await deleteMutation.mutateAsync(id);
 		} catch (err: unknown) {
 			const message =
 				err instanceof Error ? err.message : "Failed to delete submission";
@@ -130,15 +109,21 @@ export default function AdminEndpointDashboard() {
 
 		const searchLower = searchQuery.toLowerCase();
 		// Search in data
-		const inData = Object.values(sub.data).some((val) =>
-			String(val).toLowerCase().includes(searchLower)
-		);
+		const inData =
+			typeof sub.data === "object" && sub.data !== null
+				? Object.values(sub.data as Record<string, unknown>).some((val) =>
+						String(val).toLowerCase().includes(searchLower)
+				  )
+				: false;
 		// Search in browser info if visible
 		const inBrowser =
 			showBrowserInfo &&
-			Object.values(sub.browser_info).some((val) =>
-				String(val).toLowerCase().includes(searchLower)
-			);
+			typeof sub.browser_info === "object" &&
+			sub.browser_info !== null
+				? Object.values(sub.browser_info as Record<string, unknown>).some(
+						(val) => String(val).toLowerCase().includes(searchLower)
+				  )
+				: false;
 		// Search in IP or date
 		const inMeta =
 			(sub.ip_address?.toLowerCase().includes(searchLower) ?? false) ||
@@ -190,13 +175,13 @@ export default function AdminEndpointDashboard() {
 							</div>
 							<button
 								onClick={handleRefresh}
-								disabled={isPending}
+								disabled={isRefreshing}
 								className="ml-2 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
 							>
 								<RefreshCw
-									className={`w-4 h-4 ${isPending ? "animate-spin" : ""}`}
+									className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
 								/>
-								{isPending ? "Refreshing..." : "Refresh"}
+								{isRefreshing ? "Refreshing..." : "Refresh"}
 							</button>
 						</div>
 
@@ -309,7 +294,9 @@ export default function AdminEndpointDashboard() {
 					<div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-xl p-4 flex items-center gap-3">
 						<AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
 						<div className="text-sm font-medium text-red-700 dark:text-red-300">
-							{error}
+							{error instanceof Error
+								? error.message
+								: "Failed to fetch submissions"}
 						</div>
 					</div>
 				)}
@@ -349,14 +336,21 @@ export default function AdminEndpointDashboard() {
 											const dataKeys = Array.from(
 												new Set(
 													filteredSubmissions.flatMap((s) =>
-														Object.keys(s.data || {})
+														typeof s.data === "object" && s.data !== null
+															? Object.keys(s.data as Record<string, unknown>)
+															: []
 													)
 												)
 											);
 											const browserKeys = Array.from(
 												new Set(
 													filteredSubmissions.flatMap((s) =>
-														Object.keys(s.browser_info || {})
+														typeof s.browser_info === "object" &&
+														s.browser_info !== null
+															? Object.keys(
+																	s.browser_info as Record<string, unknown>
+															  )
+															: []
 													)
 												)
 											);
@@ -393,14 +387,21 @@ export default function AdminEndpointDashboard() {
 										const dataKeys = Array.from(
 											new Set(
 												filteredSubmissions.flatMap((s) =>
-													Object.keys(s.data || {})
+													typeof s.data === "object" && s.data !== null
+														? Object.keys(s.data as Record<string, unknown>)
+														: []
 												)
 											)
 										);
 										const browserKeys = Array.from(
 											new Set(
 												filteredSubmissions.flatMap((s) =>
-													Object.keys(s.browser_info || {})
+													typeof s.browser_info === "object" &&
+													s.browser_info !== null
+														? Object.keys(
+																s.browser_info as Record<string, unknown>
+														  )
+														: []
 												)
 											)
 										);
@@ -424,22 +425,36 @@ export default function AdminEndpointDashboard() {
 													<td
 														key={`${sub.id}-data-${key}`}
 														className="px-6 py-5 text-sm text-gray-700 dark:text-zinc-300 font-medium border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[300px] truncate"
-														title={String(sub.data[key])}
+														title={(() => {
+															const dataObj =
+																typeof sub.data === "object" &&
+																sub.data !== null
+																	? (sub.data as Record<string, unknown>)
+																	: {};
+															return String(dataObj[key] || "");
+														})()}
 													>
-														{sub.data[key] !== null &&
-														sub.data[key] !== undefined ? (
-															typeof sub.data[key] === "object" ? (
-																<code className="text-xs bg-gray-50 dark:bg-zinc-800 p-1 rounded font-mono truncate block text-gray-600 dark:text-zinc-400">
-																	{JSON.stringify(sub.data[key])}
-																</code>
+														{(() => {
+															const dataObj =
+																typeof sub.data === "object" &&
+																sub.data !== null
+																	? (sub.data as Record<string, unknown>)
+																	: {};
+															const value = dataObj[key];
+															return value !== null && value !== undefined ? (
+																typeof value === "object" ? (
+																	<code className="text-xs bg-gray-50 dark:bg-zinc-800 p-1 rounded font-mono truncate block text-gray-600 dark:text-zinc-400">
+																		{JSON.stringify(value)}
+																	</code>
+																) : (
+																	String(value)
+																)
 															) : (
-																String(sub.data[key])
-															)
-														) : (
-															<span className="text-gray-300 dark:text-zinc-700">
-																—
-															</span>
-														)}
+																<span className="text-gray-300 dark:text-zinc-700">
+																	—
+																</span>
+															);
+														})()}
 													</td>
 												))}
 												{showBrowserInfo &&
@@ -447,16 +462,36 @@ export default function AdminEndpointDashboard() {
 														<td
 															key={`${sub.id}-browser-${key}`}
 															className="px-6 py-5 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50/10 dark:bg-indigo-900/5 group-hover:bg-indigo-50/30 dark:group-hover:bg-indigo-900/10 transition-colors border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[200px] truncate"
-															title={String(sub.browser_info[key])}
+															title={(() => {
+																const browserObj =
+																	typeof sub.browser_info === "object" &&
+																	sub.browser_info !== null
+																		? (sub.browser_info as Record<
+																				string,
+																				unknown
+																		  >)
+																		: {};
+																return String(browserObj[key] || "");
+															})()}
 														>
-															{sub.browser_info[key] !== null &&
-															sub.browser_info[key] !== undefined ? (
-																String(sub.browser_info[key])
-															) : (
-																<span className="text-indigo-200 dark:text-indigo-900">
-																	—
-																</span>
-															)}
+															{(() => {
+																const browserObj =
+																	typeof sub.browser_info === "object" &&
+																	sub.browser_info !== null
+																		? (sub.browser_info as Record<
+																				string,
+																				unknown
+																		  >)
+																		: {};
+																const value = browserObj[key];
+																return value !== null && value !== undefined ? (
+																	String(value)
+																) : (
+																	<span className="text-indigo-200 dark:text-indigo-900">
+																		—
+																	</span>
+																);
+															})()}
 														</td>
 													))}
 												<td className="px-6 py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-10 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">

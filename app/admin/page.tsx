@@ -1,5 +1,6 @@
 "use client";
 
+import { useEndpointSummary } from "@/lib/admin-hooks";
 import {
 	AlertCircle,
 	ArrowRight,
@@ -13,59 +14,38 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { getEndpointSummary } from "./actions";
-
-interface EndpointSummary {
-	endpoint_name: string;
-	count: number;
-	latest_submission_at: Date | null;
-}
 
 export default function AdminOverview() {
-	const [endpoints, setEndpoints] = useState<EndpointSummary[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState("");
-	const [isPending, startTransition] = useTransition();
 	const [lastViewedTimestamps, setLastViewedTimestamps] = useState<
 		Record<string, string>
 	>({});
 	const router = useRouter();
 
-	const fetchEndpointSummary = useCallback(async () => {
-		try {
-			const data = await getEndpointSummary();
-			const fetchedEndpoints = data as unknown as EndpointSummary[];
-			setEndpoints(fetchedEndpoints);
-			setError("");
-		} catch (err: unknown) {
-			const message =
-				err instanceof Error ? err.message : "Failed to fetch endpoint summary";
-			setError(message);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+	const {
+		data: endpoints = [],
+		isLoading: loading,
+		isFetching: isRefreshing,
+		error,
+		refetch,
+	} = useEndpointSummary();
 
 	useEffect(() => {
-		fetchEndpointSummary();
-
 		// Load last viewed timestamps from localStorage
 		const stored = localStorage.getItem("admin_endpoint_last_viewed");
 		if (stored) {
 			try {
+				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setLastViewedTimestamps(JSON.parse(stored));
 			} catch (err) {
 				console.error("Failed to parse localStorage timestamps:", err);
 			}
 		}
-	}, [fetchEndpointSummary]);
+	}, []);
 
 	const handleRefresh = () => {
-		startTransition(async () => {
-			await fetchEndpointSummary();
-		});
+		refetch();
 	};
 
 	const handleLogout = async () => {
@@ -138,13 +118,13 @@ export default function AdminOverview() {
 							</div>
 							<button
 								onClick={handleRefresh}
-								disabled={isPending}
+								disabled={isRefreshing}
 								className="ml-2 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
 							>
 								<RefreshCw
-									className={`w-4 h-4 ${isPending ? "animate-spin" : ""}`}
+									className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
 								/>
-								{isPending ? "Refreshing..." : "Refresh"}
+								{isRefreshing ? "Refreshing..." : "Refresh"}
 							</button>
 						</div>
 
@@ -210,7 +190,9 @@ export default function AdminOverview() {
 					<div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-xl p-4 flex items-center gap-3">
 						<AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
 						<div className="text-sm font-medium text-red-700 dark:text-red-300">
-							{error}
+							{error instanceof Error
+								? error.message
+								: "Failed to fetch endpoint summary"}
 						</div>
 					</div>
 				)}
