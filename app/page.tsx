@@ -10,6 +10,7 @@ import {
 	ShieldCheck,
 	Zap,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./components/ThemeToggle";
 
@@ -175,6 +176,43 @@ export default function Home() {
 								</p>
 							</div>
 						))}
+					</div>
+				</div>
+			</section>
+
+			{/* Dashboard Preview */}
+			<section className="py-24 bg-gray-50/50 dark:bg-zinc-900/30">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="text-center mb-16">
+						<h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							See your forms in action
+						</h2>
+						<p className="text-gray-600 dark:text-zinc-400">
+							Manage all your form submissions from a beautiful, intuitive
+							dashboard.
+						</p>
+					</div>
+					<div className="max-w-6xl mx-auto">
+						<div className="bg-white dark:bg-zinc-900 rounded-3xl p-1 shadow-2xl overflow-hidden border border-gray-100 dark:border-zinc-800">
+							<div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800">
+								<div className="w-3 h-3 rounded-full bg-red-500"></div>
+								<div className="w-3 h-3 rounded-full bg-amber-500"></div>
+								<div className="w-3 h-3 rounded-full bg-green-500"></div>
+								<span className="text-gray-600 dark:text-zinc-400 text-sm font-medium ml-2">
+									FormBase Dashboard
+								</span>
+							</div>
+							<div className="p-4">
+								<Image
+									src="/Screenshot 2026-01-08 at 5.34.17 PM.png"
+									alt="FormBase Dashboard Preview"
+									width={1200}
+									height={800}
+									className="w-full rounded-xl shadow-lg"
+									priority
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
 			</section>
