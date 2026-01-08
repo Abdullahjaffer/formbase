@@ -68,13 +68,52 @@ export async function POST(
 		// Validate IP length
 		const ipAddress = ip && ip.length <= MAX_IP_LENGTH ? ip : "Unknown";
 
-		// Prepare browser info object
+		// Prepare browser info object with enhanced metadata
 		const browser_info = {
+			// Basic info
 			userAgent,
 			acceptLanguage,
 			referer,
 			ipAddress,
 			timestamp: new Date().toISOString(),
+
+			// Request origin and host
+			origin: request.headers.get("origin") || "Unknown",
+			host: request.headers.get("host") || "Unknown",
+
+			// Content info
+			contentType: request.headers.get("content-type") || "Unknown",
+			acceptEncoding: request.headers.get("accept-encoding") || "Unknown",
+
+			// Client Hints (structured device/browser info)
+			platform: request.headers.get("sec-ch-ua-platform") || "Unknown",
+			platformVersion:
+				request.headers.get("sec-ch-ua-platform-version") || "Unknown",
+			mobile: request.headers.get("sec-ch-ua-mobile") || "Unknown",
+			browserHint: request.headers.get("sec-ch-ua") || "Unknown",
+
+			// Security headers
+			dnt: request.headers.get("dnt") || "Unknown",
+			secFetchSite: request.headers.get("sec-fetch-site") || "Unknown",
+			secFetchMode: request.headers.get("sec-fetch-mode") || "Unknown",
+			secFetchDest: request.headers.get("sec-fetch-dest") || "Unknown",
+
+			// Geographic (Cloudflare/Vercel/other CDN headers)
+			country:
+				request.headers.get("cf-ipcountry") ||
+				request.headers.get("x-vercel-ip-country") ||
+				request.headers.get("cloudfront-viewer-country") ||
+				"Unknown",
+
+			// Request metadata
+			protocol: request.nextUrl.protocol,
+			requestSize: bodyText.length,
+			url: request.url,
+			pathname: request.nextUrl.pathname,
+			searchParams: Object.fromEntries(request.nextUrl.searchParams),
+
+			// Server info
+			serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 		};
 
 		// Save to database
