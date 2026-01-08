@@ -3,6 +3,7 @@
 import {
 	AlertCircle,
 	ChevronDown,
+	Copy,
 	Eye,
 	EyeOff,
 	Inbox,
@@ -93,6 +94,23 @@ export default function AdminDashboard() {
 			const message =
 				err instanceof Error ? err.message : "Failed to delete submission";
 			alert(message);
+		}
+	};
+
+	const handleCopyUrl = async (endpoint: string) => {
+		const url = `${window.location.origin}/api/${endpoint}`;
+		try {
+			await navigator.clipboard.writeText(url);
+			// You could add a toast notification here if desired
+		} catch (err) {
+			console.error("Failed to copy URL:", err);
+			// Fallback for older browsers
+			const textArea = document.createElement("textarea");
+			textArea.value = url;
+			document.body.appendChild(textArea);
+			textArea.select();
+			document.execCommand("copy");
+			document.body.removeChild(textArea);
 		}
 	};
 
@@ -351,6 +369,23 @@ export default function AdminDashboard() {
 											<span className="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-100 dark:border-indigo-800">
 												{subs.length} items
 											</span>
+										</div>
+									</div>
+									<div className="flex items-center gap-3 ml-11">
+										<span className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
+											Form URL:
+										</span>
+										<div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-700">
+											<code className="text-xs font-mono text-gray-700 dark:text-zinc-300">
+												{`${window.location.origin}/api/${endpoint}`}
+											</code>
+											<button
+												onClick={() => handleCopyUrl(endpoint)}
+												className="p-1 text-gray-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition-all"
+												title="Copy URL to clipboard"
+											>
+												<Copy className="w-3.5 h-3.5" />
+											</button>
 										</div>
 									</div>
 
