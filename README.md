@@ -1,24 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Form Backend with Admin Panel
 
-## Getting Started
+A Next.js backend service for capturing form submissions with a protected admin dashboard.
 
-First, run the development server:
+## Features
+
+- **Dynamic API Endpoints**: Accept POST requests to any endpoint (e.g., `/api/contact_form`)
+- **PostgreSQL Database**: Store submissions with metadata and browser information
+- **Admin Dashboard**: Protected admin panel to view and filter submissions
+- **Authentication**: Simple username/password authentication using environment variables
+- **Character Limits**: Built-in validation to prevent abuse
+
+## Setup
+
+### 1. Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/form_backend"
+
+# Admin Authentication
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_secure_password_here
+
+# JWT Secret (generate a secure random string for production)
+JWT_SECRET=your-jwt-secret-key-change-this-in-production
+```
+
+### 2. Database Setup
+
+1. Create a PostgreSQL database
+2. Run Prisma migrations:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## API Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Submit Form Data
+
+Send POST requests to any endpoint under `/api/`:
+
+```bash
+curl -X POST http://localhost:3000/api/contact_form \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@example.com","message":"Hello!"}'
+```
+
+### Admin Access
+
+1. Visit `/admin/login` to log in with your admin credentials
+2. Access the dashboard at `/admin` to view submissions
+
+## Database Schema
+
+The `Submission` table includes:
+
+- `id`: UUID primary key
+- `endpoint_name`: The API endpoint name (max 255 chars)
+- `data`: JSONB form data
+- `browser_info`: JSONB browser and request metadata
+- `created_at`: Timestamp
+- `ip_address`: IP address (max 45 chars for IPv6)
 
 ## Learn More
 
