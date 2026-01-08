@@ -410,7 +410,7 @@ export default function AdminEndpointDashboard() {
 												key={sub.id}
 												className="group hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all duration-200"
 											>
-												<td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500 dark:text-zinc-400 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-900/20 transition-colors z-10 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+												<td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500 dark:text-zinc-400 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-10 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
 													<div className="flex flex-col">
 														<span>
 															{new Date(sub.created_at).toLocaleDateString()}
@@ -459,7 +459,7 @@ export default function AdminEndpointDashboard() {
 															)}
 														</td>
 													))}
-												<td className="px-6 py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-900/20 transition-colors z-10 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
+												<td className="px-6 py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-10 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
 													<div className="flex items-center gap-3">
 														{sub.ip_address && (
 															<span className="text-[10px] bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-mono font-bold">
