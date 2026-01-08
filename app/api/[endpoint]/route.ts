@@ -37,6 +37,19 @@ export async function POST(
 		let data: Record<string, unknown>;
 		try {
 			data = JSON.parse(bodyText);
+			if (
+				typeof data !== "object" ||
+				data === null ||
+				Array.isArray(data) ||
+				data === undefined ||
+				Object.keys(data).length > 30
+			) {
+				console.error("Invalid JSON data");
+				return NextResponse.json(
+					{ error: "Invalid JSON data" },
+					{ status: 400 }
+				);
+			}
 		} catch {
 			console.error("Invalid JSON data");
 			return NextResponse.json({ error: "Invalid JSON data" }, { status: 400 });

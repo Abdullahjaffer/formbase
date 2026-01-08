@@ -1,177 +1,280 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { deleteSubmission, getSubmissions } from "./actions";
 
 interface Submission {
-  id: string;
-  endpoint_name: string;
-  data: any;
-  browser_info: any;
-  created_at: string;
-  ip_address: string | null;
+	id: string;
+	endpoint_name: string;
+	data: Record<string, unknown>;
+	browser_info: Record<string, unknown>;
+	created_at: Date;
+	ip_address: string | null;
 }
 
 export default function AdminDashboard() {
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [selectedEndpoint, setSelectedEndpoint] = useState<string>('all');
-  const [endpoints, setEndpoints] = useState<string[]>([]);
-  const router = useRouter();
+	const [submissions, setSubmissions] = useState<Submission[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
+	const [isPending, startTransition] = useTransition();
+	const [endpointFilter, setEndpointFilter] = useState<string>("");
+	const [showBrowserInfo, setShowBrowserInfo] = useState(false);
+	const router = useRouter();
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, []);
+	const fetchSubmissionsData = useCallback(async () => {
+		try {
+			const data = await getSubmissions();
+			const fetchedSubmissions = data as unknown as Submission[];
+			setSubmissions(fetchedSubmissions);
 
-  useEffect(() => {
-    // Filter submissions based on selected endpoint
-    if (selectedEndpoint === 'all') {
-      setFilteredSubmissions(submissions);
-    } else {
-      setFilteredSubmissions(submissions.filter(sub => sub.endpoint_name === selectedEndpoint));
-    }
-  }, [submissions, selectedEndpoint]);
+			// Set initial filter to first endpoint if not set
+			setEndpointFilter((prev) => {
+				if (fetchedSubmissions.length > 0 && !prev) {
+					const unique = Array.from(
+						new Set(fetchedSubmissions.map((s) => s.endpoint_name))
+					).sort();
+					return unique.length > 0 ? unique[0] : prev;
+				}
+				return prev;
+			});
+			setError("");
+		} catch (err: unknown) {
+			const message =
+				err instanceof Error ? err.message : "Failed to fetch submissions";
+			setError(message);
+		} finally {
+			setLoading(false);
+		}
+	}, []);
 
-  const fetchSubmissions = async () => {
-    try {
-      const response = await fetch('/api/admin/submissions');
-      if (response.ok) {
-        const data = await response.json();
-        setSubmissions(data.submissions);
-        // Extract unique endpoints
-        const uniqueEndpoints = [...new Set(data.submissions.map((sub: Submission) => sub.endpoint_name))];
-        setEndpoints(uniqueEndpoints);
-      } else {
-        setError('Failed to fetch submissions');
-      }
-    } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+	useEffect(() => {
+		fetchSubmissionsData();
+	}, [fetchSubmissionsData]);
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/admin/logout', { method: 'POST' });
-      router.push('/admin/login');
-    } catch (err) {
-      router.push('/admin/login');
-    }
-  };
+	const handleRefresh = () => {
+		startTransition(async () => {
+			await fetchSubmissionsData();
+		});
+	};
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
+	const handleLogout = async () => {
+		try {
+			await fetch("/api/admin/logout", { method: "POST" });
+			router.push("/admin/login");
+		} catch {
+			router.push("/admin/login");
+		}
+	};
 
-  const formatJson = (data: any) => {
-    return JSON.stringify(data, null, 2);
-  };
+	const handleDelete = async (id: string) => {
+		if (!confirm("Are you sure you want to delete this submission?")) return;
+		try {
+			await deleteSubmission(id);
+			await fetchSubmissionsData();
+		} catch (err: unknown) {
+			const message =
+				err instanceof Error ? err.message : "Failed to delete submission";
+			alert(message);
+		}
+	};
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
+	const formatDate = (date: Date) => {
+		return new Date(date).toLocaleString();
+	};
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+	// Get unique endpoints for the filter
+	const uniqueEndpoints = Array.from(
+		new Set(submissions.map((s) => s.endpoint_name))
+	).sort();
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="text-sm text-red-700">{error}</div>
-          </div>
-        )}
+	// Group submissions by endpoint_name and apply filter
+	const groupedSubmissions = submissions.reduce((acc, sub) => {
+		if (sub.endpoint_name !== endpointFilter) {
+			return acc;
+		}
+		if (!acc[sub.endpoint_name]) {
+			acc[sub.endpoint_name] = [];
+		}
+		acc[sub.endpoint_name].push(sub);
+		return acc;
+	}, {} as Record<string, Submission[]>);
 
-        {/* Filter */}
-        <div className="mb-6">
-          <label htmlFor="endpoint-filter" className="block text-sm font-medium text-gray-700 mb-2">
-            Filter by Endpoint
-          </label>
-          <select
-            id="endpoint-filter"
-            value={selectedEndpoint}
-            onChange={(e) => setSelectedEndpoint(e.target.value)}
-            className="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option value="all">All Endpoints</option>
-            {endpoints.map(endpoint => (
-              <option key={endpoint} value={endpoint}>{endpoint}</option>
-            ))}
-          </select>
-        </div>
+	if (loading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<div className="text-lg animate-pulse">Loading dashboard...</div>
+			</div>
+		);
+	}
 
-        {/* Submissions List */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <div className="px-4 py-5 sm:p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              Form Submissions ({filteredSubmissions.length})
-            </h2>
+	return (
+		<div className="min-h-screen bg-gray-50 pb-12">
+			{/* Header */}
+			<div className="bg-white shadow-sm sticky top-0 z-10">
+				<div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex justify-between items-center py-4">
+						<div className="flex items-center gap-4">
+							<h1 className="text-xl font-bold text-gray-900">
+								Admin Dashboard
+							</h1>
+							<button
+								onClick={handleRefresh}
+								disabled={isPending}
+								className="flex items-center gap-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+							>
+								{isPending ? "Refreshing..." : "Refresh"}
+							</button>
+						</div>
+						<div className="flex items-center gap-4">
+							<button
+								onClick={() => setShowBrowserInfo(!showBrowserInfo)}
+								className={`px-3 py-1 w-full bg-gray-100 rounded-md text-xs font-medium transition-all ${
+									showBrowserInfo
+										? "bg-white text-gray-900 shadow-sm"
+										: "text-gray-500 hover:text-gray-700"
+								}`}
+							>
+								{showBrowserInfo ? "Hide Browser Info" : "Show Browser Info"}
+							</button>
+							<select
+								value={endpointFilter}
+								onChange={(e) => setEndpointFilter(e.target.value)}
+								className="block w-full max-w-xs px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+							>
+								{uniqueEndpoints.length === 0 && (
+									<option value="">No Endpoints</option>
+								)}
+								{uniqueEndpoints.map((endpoint) => (
+									<option key={endpoint} value={endpoint}>
+										{endpoint}
+									</option>
+								))}
+							</select>
+							<button
+								onClick={handleLogout}
+								className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+							>
+								Logout
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            {filteredSubmissions.length === 0 ? (
-              <p className="text-gray-500">No submissions found.</p>
-            ) : (
-              <div className="space-y-6">
-                {filteredSubmissions.map((submission) => (
-                  <div key={submission.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-900">
-                          Endpoint: {submission.endpoint_name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          Submitted: {formatDate(submission.created_at)}
-                        </p>
-                        {submission.ip_address && (
-                          <p className="text-sm text-gray-500">
-                            IP: {submission.ip_address}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-xs text-gray-400">ID: {submission.id}</span>
-                    </div>
+			<div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				{error && (
+					<div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+						<div className="text-sm text-red-700">{error}</div>
+					</div>
+				)}
 
-                    {/* Form Data */}
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Form Data:</h4>
-                      <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
-                        {formatJson(submission.data)}
-                      </pre>
-                    </div>
+				{Object.keys(groupedSubmissions).length === 0 ? (
+					<div className="text-center py-12 bg-white rounded-lg shadow-sm">
+						<p className="text-gray-500">No submissions found yet.</p>
+					</div>
+				) : (
+					<div className="space-y-12">
+						{Object.entries(groupedSubmissions).map(([endpoint, subs]) => {
+							const dataKeys = Array.from(
+								new Set(subs.flatMap((s) => Object.keys(s.data || {})))
+							);
+							const browserKeys = Array.from(
+								new Set(subs.flatMap((s) => Object.keys(s.browser_info || {})))
+							);
 
-                    {/* Browser Info */}
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Browser Info:</h4>
-                      <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
-                        {formatJson(submission.browser_info)}
-                      </pre>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+							return (
+								<div key={endpoint} className="space-y-4">
+									<div className="flex items-baseline gap-2">
+										<h2 className="text-lg font-bold text-gray-800">
+											Endpoint:{" "}
+											<span className="text-indigo-600">{endpoint}</span>
+										</h2>
+										<span className="text-sm text-gray-500">
+											({subs.length} submissions)
+										</span>
+									</div>
+
+									<div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+										<div className="overflow-x-auto">
+											<table className="min-w-full divide-y divide-gray-200">
+												<thead className="bg-gray-50">
+													<tr>
+														<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-50 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+															Date
+														</th>
+														{dataKeys.map((key) => (
+															<th
+																key={`data-${key}`}
+																className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+															>
+																{key}
+															</th>
+														))}
+														{showBrowserInfo &&
+															browserKeys.map((key) => (
+																<th
+																	key={`browser-${key}`}
+																	className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider italic"
+																>
+																	{key}
+																</th>
+															))}
+														<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+															Actions
+														</th>
+													</tr>
+												</thead>
+												<tbody className="bg-white divide-y divide-gray-200">
+													{subs.map((sub) => (
+														<tr
+															key={sub.id}
+															className="hover:bg-gray-50 transition-colors"
+														>
+															<td className="px-4 py-3 whitespace-nowrap text-xs text-gray-600 sticky left-0 bg-white shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+																{formatDate(sub.created_at)}
+															</td>
+															{dataKeys.map((key) => (
+																<td
+																	key={`${sub.id}-data-${key}`}
+																	className="px-4 py-3 text-sm text-gray-900"
+																>
+																	{typeof sub.data[key] === "object"
+																		? JSON.stringify(sub.data[key])
+																		: String(sub.data[key] ?? "-")}
+																</td>
+															))}
+															{showBrowserInfo &&
+																browserKeys.map((key) => (
+																	<td
+																		key={`${sub.id}-browser-${key}`}
+																		className="px-4 py-3 text-xs text-gray-500"
+																	>
+																		{typeof sub.browser_info[key] === "object"
+																			? JSON.stringify(sub.browser_info[key])
+																			: String(sub.browser_info[key] ?? "-")}
+																	</td>
+																))}
+															<td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+																<button
+																	onClick={() => handleDelete(sub.id)}
+																	className="text-red-600 hover:text-red-900 transition-colors"
+																>
+																	Delete
+																</button>
+															</td>
+														</tr>
+													))}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
+			</div>
+		</div>
+	);
 }
