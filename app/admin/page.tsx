@@ -166,7 +166,7 @@ export default function AdminDashboard() {
 									Admin Dashboard
 								</h1>
 								<p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
-									Any-Form Control Panel
+									FormBase Control Panel
 								</p>
 							</div>
 							<button

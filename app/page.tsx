@@ -25,7 +25,7 @@ export default function Home() {
 								<Layers className="w-5 h-5 text-white" />
 							</div>
 							<span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-								Any-Form
+								FormBase
 							</span>
 						</div>
 						<div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600 dark:text-zinc-400">
@@ -71,7 +71,7 @@ export default function Home() {
 					</h1>
 					<p className="text-xl text-gray-600 dark:text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
 						Stop building custom backends for every form. Send your data to
-						Any-Form and manage everything from a beautiful dashboard.
+						FormBase and manage everything from a beautiful dashboard.
 					</p>
 					<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
 						<Link
@@ -82,7 +82,7 @@ export default function Home() {
 							Go to Admin Panel
 						</Link>
 						<a
-							href="https://github.com/abdullah/any-form-backend"
+							href="https://github.com/abdullah/formbase"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="w-full sm:w-auto bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"
@@ -230,7 +230,7 @@ export default function Home() {
   body: JSON.stringify({
     name: 'Jane Smith',
     email: 'jane@example.com',
-    message: 'Hello from Any-Form!',
+    message: 'Hello from FormBase!',
     plan: 'Premium'
   })
 })`}
@@ -272,11 +272,11 @@ export default function Home() {
 							<Layers className="w-4 h-4 text-gray-600 dark:text-zinc-400" />
 						</div>
 						<span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-							Any-Form
+							FormBase
 						</span>
 					</div>
 					<p className="text-gray-500 dark:text-zinc-400 text-sm">
-						&copy; {new Date().getFullYear()} Any-Form. Built for developers.
+						&copy; {new Date().getFullYear()} FormBase. Built for developers.
 						<br />
 						Created by{" "}
 						<a

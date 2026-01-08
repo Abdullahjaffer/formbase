@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Any-Form | Universal Form Backend",
+	title: "FormBase | Universal Form Backend",
 	description: "Manage all your forms in one place",
 };
 

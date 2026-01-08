@@ -1,12 +1,12 @@
-# Any-Form: The Universal Form Backend
+# FormBase: The Universal Form Backend
 
-**Self-hostable.** Manage all your forms from different websites, apps, and services in **one single place**. Any-Form is a lightweight, zero-config backend that lets you collect submissions from any source and view them in a beautiful, unified dashboard.
+**Self-hostable.** Manage all your forms from different websites, apps, and services in **one single place**. FormBase is a lightweight, zero-config backend that lets you collect submissions from any source and view them in a beautiful, unified dashboard.
 
-![Any-Form Dashboard](./public/Screenshot%202026-01-08%20at%205.34.17%20PM.png)
+![FormBase Dashboard](./public/Screenshot%202026-01-08%20at%205.34.17%20PM.png)
 
-## Why Any-Form?
+## Why FormBase?
 
-Instead of setting up separate backends or using expensive third-party services for every simple contact form or lead capture, Any-Form provides a central hub. Just send a POST request from anywhere, and it's instantly managed.
+Instead of setting up separate backends or using expensive third-party services for every simple contact form or lead capture, FormBase provides a central hub. Just send a POST request from anywhere, and it's instantly managed.
 
 Since it's open-source and self-hostable, you own your data. Clone it, deploy it to your own server, and you're ready to go.
 
@@ -24,8 +24,8 @@ Since it's open-source and self-hostable, you own your data. Clone it, deploy it
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/any-form.git
-cd any-form
+git clone https://github.com/your-username/formbase.git
+cd formbase
 ```
 
 ### 2. Environment Configuration
@@ -34,7 +34,7 @@ Create a `.env.local` file in the root directory:
 
 ```env
 # Database (PostgreSQL)
-DATABASE_URL="postgresql://username:password@localhost:5432/any_form"
+DATABASE_URL="postgresql://username:password@localhost:5432/formbase"
 
 # Admin Credentials
 ADMIN_USERNAME=admin
@@ -71,13 +71,13 @@ Visit [http://localhost:3000/admin](http://localhost:3000/admin) to access your 
 You can send data from any frontend using a simple `fetch` request:
 
 ```javascript
-fetch("https://your-any-form-instance.com/api/contact-page", {
+fetch("https://your-formbase-instance.com/api/contact-page", {
 	method: "POST",
 	headers: { "Content-Type": "application/json" },
 	body: JSON.stringify({
 		name: "John Doe",
 		email: "john@example.com",
-		message: "I love Any-Form!",
+		message: "I love FormBase!",
 	}),
 });
 ```
@@ -86,7 +86,7 @@ The endpoint name (`contact-page` in this example) is dynamic. You can use whate
 
 ## Deployment
 
-Any-Form is designed to be hosted anywhere.
+FormBase is designed to be hosted anywhere.
 
 - **Vercel**: The easiest way to deploy. Just push your code to GitHub and connect it to Vercel.
 - **Docker**: You can easily containerize this app for any cloud provider.
