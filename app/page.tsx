@@ -277,6 +277,16 @@ export default function Home() {
 					</div>
 					<p className="text-gray-500 dark:text-zinc-400 text-sm">
 						&copy; {new Date().getFullYear()} Any-Form. Built for developers.
+						<br />
+						Created by{" "}
+						<a
+							href="https://codexty.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-indigo-600 dark:text-indigo-400 hover:underline"
+						>
+							codexty.com
+						</a>
 					</p>
 				</div>
 			</footer>
