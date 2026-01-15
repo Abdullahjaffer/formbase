@@ -1,13 +1,14 @@
 "use client";
 
+import { Eye, EyeOff, Layers } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "../../components/ThemeToggle";
-import { Layers } from "lucide-react";
 
 export default function AdminLogin() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
@@ -82,13 +83,24 @@ export default function AdminLogin() {
 							<input
 								id="password"
 								name="password"
-								type="password"
+								type={showPassword ? "text" : "password"}
 								required
-								className="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:z-10 sm:text-sm transition-colors"
+								className="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:z-10 sm:text-sm transition-colors pr-12"
 								placeholder="Password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 							/>
+							<button
+								type="button"
+								className="absolute inset-y-0 right-0 pr-4 flex items-center z-20 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+								onClick={() => setShowPassword(!showPassword)}
+							>
+								{showPassword ? (
+									<EyeOff className="h-5 w-5" />
+								) : (
+									<Eye className="h-5 w-5" />
+								)}
+							</button>
 						</div>
 					</div>
 
