@@ -59,8 +59,8 @@ export default function AdminLogin() {
 						Sign in to access the FormBase control panel
 					</p>
 				</div>
-				<form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-					<div className="rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800">
+				<form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+					<div className="space-y-0">
 						<div className="relative">
 							<label htmlFor="username" className="sr-only">
 								Username
@@ -70,7 +70,7 @@ export default function AdminLogin() {
 								name="username"
 								type="text"
 								required
-								className="appearance-none relative block w-full px-4 py-3 border-b border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:z-10 sm:text-sm transition-colors"
+								className="appearance-none relative block w-full px-4 py-3 border border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all"
 								placeholder="Username"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
@@ -85,7 +85,7 @@ export default function AdminLogin() {
 								name="password"
 								type={showPassword ? "text" : "password"}
 								required
-								className="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:z-10 sm:text-sm transition-colors pr-12"
+								className="appearance-none relative block w-full px-4 py-3 border border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all pr-12 -mt-px"
 								placeholder="Password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
