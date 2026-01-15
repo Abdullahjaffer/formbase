@@ -1,5 +1,6 @@
 import {
 	deleteSubmission,
+	getAnalyticsData,
 	getEndpointSummary,
 	getSubmissionById,
 	getSubmissions,
@@ -12,6 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const queryKeys = {
 	submissions: ["submissions"] as const,
 	endpointSummary: ["endpoint-summary"] as const,
+	analytics: (days: number) => ["analytics", days] as const,
 	submissionsByEndpoint: (endpoint: string) =>
 		["submissions", endpoint] as const,
 	submissionById: (id: string) => ["submission", id] as const,
@@ -22,6 +24,8 @@ export function useSubmissions() {
 	return useQuery({
 		queryKey: queryKeys.submissions,
 		queryFn: getSubmissions,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
 	});
 }
 
@@ -30,6 +34,8 @@ export function useEndpointSummary() {
 	return useQuery({
 		queryKey: queryKeys.endpointSummary,
 		queryFn: getEndpointSummary,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
 	});
 }
 
@@ -39,6 +45,8 @@ export function useSubmissionsByEndpoint(endpoint: string) {
 		queryKey: queryKeys.submissionsByEndpoint(endpoint),
 		queryFn: () => getSubmissionsByEndpoint(endpoint),
 		enabled: !!endpoint, // Only run if endpoint is provided
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
 	});
 }
 
@@ -48,6 +56,18 @@ export function useSubmissionById(id: string) {
 		queryKey: queryKeys.submissionById(id),
 		queryFn: () => getSubmissionById(id),
 		enabled: !!id, // Only run if id is provided
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
+	});
+}
+
+// Hook for fetching analytics data
+export function useAnalyticsData(days: number = 30) {
+	return useQuery({
+		queryKey: queryKeys.analytics(days),
+		queryFn: () => getAnalyticsData(days),
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
 	});
 }
 

@@ -88,7 +88,7 @@ export default function SubmissionDetailPage() {
 		}
 
 		return (
-			<span className="text-gray-900 dark:text-white break-words">
+			<span className="text-gray-900 dark:text-white wrap-break-word">
 				{String(value)}
 			</span>
 		);
@@ -130,70 +130,78 @@ export default function SubmissionDetailPage() {
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-zinc-950 pb-12 transition-colors duration-300">
 			{/* Header */}
-			<div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm">
+			<div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-20 shadow-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex flex-col md:flex-row md:items-center justify-between py-4 gap-4">
-						<div className="flex items-center gap-4">
-							<Link
-								href={`/admin/${endpoint}`}
-								className="flex items-center gap-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-							>
-								<ArrowLeft className="w-4 h-4" />
-								<span className="text-sm font-medium">Back to Submissions</span>
-							</Link>
-							<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg">
-								<LayoutDashboard className="w-6 h-6 text-white" />
-							</div>
-							<div>
-								<h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
-									Submission Details
-								</h1>
-								<p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
-									{endpoint}
-								</p>
+					<div className="flex flex-col lg:flex-row lg:items-center justify-between py-4 gap-4">
+						<div className="flex flex-col sm:flex-row sm:items-center gap-4">
+							<div className="flex items-center justify-between w-full sm:w-auto gap-4">
+								<Link
+									href={`/admin/${endpoint}`}
+									className="flex items-center gap-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0"
+								>
+									<ArrowLeft className="w-4 h-4" />
+									<span className="text-sm font-medium hidden sm:inline">
+										Back
+									</span>
+								</Link>
+								<div className="flex items-center gap-3">
+									<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg shrink-0">
+										<LayoutDashboard className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+									</div>
+									<div className="min-w-0">
+										<h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white leading-tight truncate">
+											Submission Details
+										</h1>
+										<p className="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
+											{endpoint}
+										</p>
+									</div>
+								</div>
 							</div>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-3">
-							<ThemeToggle />
+						<div className="flex flex-wrap items-center gap-2 sm:gap-3">
+							<div className="flex-1 sm:flex-none flex justify-center">
+								<ThemeToggle />
+							</div>
 							<button
 								onClick={handleDelete}
-								className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+								className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-2.5 sm:py-2 rounded-lg text-xs font-bold transition-all min-h-[40px]"
 							>
-								<Trash2 className="w-4 h-4" />
-								Delete
+								<Trash2 className="w-3.5 h-3.5" />
+								<span>Delete</span>
 							</button>
 							<button
 								onClick={handleLogout}
-								className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+								className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2.5 sm:py-2 rounded-lg text-xs font-bold transition-all min-h-[40px]"
 							>
-								<LogOut className="w-4 h-4" />
-								Logout
+								<LogOut className="w-3.5 h-3.5" />
+								<span>Logout</span>
 							</button>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					{/* Metadata Card */}
-					<div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-6">
+					<div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-5 sm:p-6">
 						<h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
 							<Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
 							Metadata
 						</h2>
 						<div className="space-y-4">
 							<div>
-								<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+								<label className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
 									Submission ID
 								</label>
-								<p className="text-sm font-mono text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-950 p-2 rounded mt-1 break-all">
+								<p className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-950 p-2 rounded mt-1 break-all">
 									{submission.id}
 								</p>
 							</div>
 							<div>
-								<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+								<label className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
 									Timestamp
 								</label>
 								<p className="text-sm text-gray-900 dark:text-white mt-1">
@@ -202,11 +210,11 @@ export default function SubmissionDetailPage() {
 							</div>
 							{submission.ip_address && (
 								<div>
-									<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1">
+									<label className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1">
 										<Globe className="w-3 h-3" />
 										IP Address
 									</label>
-									<p className="text-sm font-mono text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-950 p-2 rounded mt-1">
+									<p className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-950 p-2 rounded mt-1">
 										{submission.ip_address}
 									</p>
 								</div>
@@ -215,7 +223,7 @@ export default function SubmissionDetailPage() {
 					</div>
 
 					{/* Form Data Card */}
-					<div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-6">
+					<div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-5 sm:p-6">
 						<h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
 							<Database className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
 							Form Data
@@ -234,10 +242,12 @@ export default function SubmissionDetailPage() {
 											key={key}
 											className="border-b border-gray-100 dark:border-zinc-800 pb-4 last:border-0 last:pb-0"
 										>
-											<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
+											<label className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
 												{key}
 											</label>
-											<div className="text-sm">{renderValue(value)}</div>
+											<div className="text-sm overflow-hidden">
+												{renderValue(value)}
+											</div>
 										</div>
 									))
 								) : (
@@ -250,12 +260,12 @@ export default function SubmissionDetailPage() {
 					</div>
 
 					{/* Browser Info Card */}
-					<div className="lg:col-span-3 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-6">
+					<div className="lg:col-span-3 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-5 sm:p-6">
 						<h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
 							<Monitor className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
 							Browser Information
 						</h2>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 							{(() => {
 								const browserObj =
 									typeof submission.browser_info === "object" &&
@@ -269,10 +279,12 @@ export default function SubmissionDetailPage() {
 											key={key}
 											className="bg-gray-50 dark:bg-zinc-950 rounded-lg p-4 border border-gray-100 dark:border-zinc-800"
 										>
-											<label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
+											<label className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 block">
 												{key}
 											</label>
-											<div className="text-sm">{renderValue(value)}</div>
+											<div className="text-sm overflow-hidden">
+												{renderValue(value)}
+											</div>
 										</div>
 									))
 								) : (

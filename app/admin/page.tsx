@@ -1,9 +1,10 @@
 "use client";
 
-import { useEndpointSummary } from "@/lib/admin-hooks";
+import { useAnalyticsData, useEndpointSummary } from "@/lib/admin-hooks";
 import {
 	AlertCircle,
 	ArrowRight,
+	BarChart3,
 	Clock,
 	Inbox,
 	LayoutDashboard,
@@ -14,6 +15,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { DeviceBrowserChart } from "../components/analytics/DeviceBrowserChart";
+import { GeographicChart } from "../components/analytics/GeographicChart";
+import { SubmissionsTimeChart } from "../components/analytics/SubmissionsTimeChart";
 import { ThemeToggle } from "../components/ThemeToggle";
 
 interface EndpointSummaryItem {
@@ -25,6 +30,7 @@ interface EndpointSummaryItem {
 
 export default function AdminOverview() {
 	const router = useRouter();
+	const [days, setDays] = useState(30);
 
 	const {
 		data: endpoints = [],
@@ -33,6 +39,12 @@ export default function AdminOverview() {
 		error,
 		refetch,
 	} = useEndpointSummary();
+
+	const {
+		data: analytics,
+		isLoading: analyticsLoading,
+		error: analyticsError,
+	} = useAnalyticsData(days);
 
 	const handleRefresh = () => {
 		refetch();
@@ -95,36 +107,41 @@ export default function AdminOverview() {
 			{/* Header */}
 			<div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm">
 				<div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center justify-between py-4">
-						<div className="flex items-center gap-4">
-							<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg">
-								<LayoutDashboard className="w-6 h-6 text-white" />
-							</div>
-							<div>
-								<h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
-									Admin Overview
-								</h1>
-								<p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
-									FormBase Control Panel
-								</p>
+					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 gap-4">
+						<div className="flex items-center justify-between w-full sm:w-auto gap-4">
+							<div className="flex items-center gap-4">
+								<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg shrink-0">
+									<LayoutDashboard className="w-6 h-6 text-white" />
+								</div>
+								<div>
+									<h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+										Admin Overview
+									</h1>
+									<p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
+										FormBase Control Panel
+									</p>
+								</div>
 							</div>
 							<button
 								onClick={handleRefresh}
 								disabled={isRefreshing}
-								className="ml-2 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
+								className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-2 sm:py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
+								title="Refresh data"
 							>
 								<RefreshCw
 									className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
 								/>
-								{isRefreshing ? "Refreshing..." : "Refresh"}
+								<span className="hidden sm:inline">
+									{isRefreshing ? "Refreshing..." : "Refresh"}
+								</span>
 							</button>
 						</div>
 
-						<div className="flex items-center gap-3">
+						<div className="flex items-center justify-end w-full sm:w-auto gap-3">
 							<ThemeToggle />
 							<button
 								onClick={handleLogout}
-								className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+								className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2 rounded-lg text-sm font-bold transition-all min-h-[40px]"
 							>
 								<LogOut className="w-4 h-4" />
 								Logout
@@ -178,6 +195,76 @@ export default function AdminOverview() {
 					</div>
 				</div>
 
+				{/* Analytics Section */}
+				<div className="mb-12">
+					<div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+						<div className="flex items-center gap-3">
+							<div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg">
+								<BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+							</div>
+							<h2 className="text-xl font-bold text-gray-900 dark:text-white">
+								Analytics Dashboard
+							</h2>
+						</div>
+
+						<div className="flex items-center w-full md:w-auto bg-white dark:bg-zinc-900 rounded-xl p-1 shadow-sm border border-gray-100 dark:border-zinc-800">
+							{[7, 30, 90].map((d) => (
+								<button
+									key={d}
+									onClick={() => setDays(d)}
+									className={`flex-1 md:flex-none px-4 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
+										days === d
+											? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none"
+											: "text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white"
+									}`}
+								>
+									Last {d} Days
+								</button>
+							))}
+						</div>
+					</div>
+
+					{analyticsLoading ? (
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div className="lg:col-span-2 h-[350px] bg-white dark:bg-zinc-900 rounded-2xl animate-pulse border border-gray-100 dark:border-zinc-800" />
+							<div className="h-[350px] bg-white dark:bg-zinc-900 rounded-2xl animate-pulse border border-gray-100 dark:border-zinc-800" />
+							<div className="h-[350px] bg-white dark:bg-zinc-900 rounded-2xl animate-pulse border border-gray-100 dark:border-zinc-800" />
+						</div>
+					) : analyticsError ? (
+						<div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-2xl p-8 text-center">
+							<AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+							<p className="text-red-800 dark:text-red-300 font-bold">
+								Failed to load analytics
+							</p>
+							<p className="text-red-600 dark:text-red-400 text-sm mt-1">
+								{analyticsError instanceof Error
+									? analyticsError.message
+									: "An unexpected error occurred"}
+							</p>
+						</div>
+					) : analytics ? (
+						<div className="space-y-6">
+							<SubmissionsTimeChart data={analytics.timeSeries} />
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+								<GeographicChart data={analytics.geographic} />
+								<DeviceBrowserChart
+									devices={analytics.devices}
+									browsers={analytics.browsers}
+								/>
+							</div>
+						</div>
+					) : null}
+				</div>
+
+				<div className="flex items-center gap-3 mb-6">
+					<div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg">
+						<Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+					</div>
+					<h2 className="text-xl font-bold text-gray-900 dark:text-white">
+						Active Endpoints
+					</h2>
+				</div>
+
 				{error && (
 					<div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-xl p-4 flex items-center gap-3">
 						<AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
@@ -202,7 +289,7 @@ export default function AdminOverview() {
 						</p>
 					</div>
 				) : (
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{endpoints.map((endpoint: EndpointSummaryItem) => {
 							const newCount = getNewSubmissionsCount(
 								endpoint.latest_submission_at,
@@ -244,7 +331,7 @@ export default function AdminOverview() {
 									</div>
 
 									<div className="space-y-3">
-										<h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight">
+										<h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight truncate">
 											{endpoint.endpoint_name}
 										</h3>
 

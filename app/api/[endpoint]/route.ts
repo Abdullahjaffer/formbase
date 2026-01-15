@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { sendSubmissionNotification } from "@/lib/email";
 import { NextRequest, NextResponse } from "next/server";
 
 // Character limits as requested
@@ -126,6 +127,11 @@ export async function POST(
 				browser_info: browser_info as any,
 				ip_address: ipAddress,
 			},
+		});
+
+		// Send email notification (fire and forget)
+		sendSubmissionNotification(submission).catch((err) => {
+			console.error("Email notification failed:", err);
 		});
 
 		return NextResponse.json(
