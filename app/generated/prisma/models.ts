@@ -9,4 +9,5 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Submission.ts'
+export type * from './models/EndpointView.ts'
 export type * from './commonInputTypes.ts'

@@ -3,6 +3,7 @@
 import {
 	useDeleteSubmission,
 	useSubmissionsByEndpoint,
+	useUpdateLastViewed,
 } from "@/lib/admin-hooks";
 import {
 	AlertCircle,
@@ -39,23 +40,12 @@ export default function AdminEndpointDashboard() {
 		refetch,
 	} = useSubmissionsByEndpoint(endpoint);
 	const deleteMutation = useDeleteSubmission();
+	const updateLastViewedMutation = useUpdateLastViewed();
 
 	useEffect(() => {
-		// Update localStorage timestamp for this endpoint
-		const stored = localStorage.getItem("admin_endpoint_last_viewed");
-		let timestamps: Record<string, string> = {};
-		if (stored) {
-			try {
-				timestamps = JSON.parse(stored);
-			} catch (err) {
-				console.error("Failed to parse localStorage timestamps:", err);
-			}
+		if (endpoint) {
+			updateLastViewedMutation.mutate(endpoint);
 		}
-		timestamps[endpoint] = new Date().toISOString();
-		localStorage.setItem(
-			"admin_endpoint_last_viewed",
-			JSON.stringify(timestamps)
-		);
 	}, [endpoint]);
 
 	const handleRefresh = () => {

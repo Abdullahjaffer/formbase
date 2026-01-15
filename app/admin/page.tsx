@@ -14,24 +14,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { ThemeToggle } from "../components/ThemeToggle";
 
+interface EndpointSummaryItem {
+	endpoint_name: string;
+	count: number;
+	latest_submission_at: Date | null;
+	last_viewed_at: Date | null;
+}
+
 export default function AdminOverview() {
-	const [lastViewedTimestamps] = useState<Record<string, string>>(() => {
-		// Load last viewed timestamps from localStorage on initial render only
-		if (typeof window !== "undefined") {
-			const stored = localStorage.getItem("admin_endpoint_last_viewed");
-			if (stored) {
-				try {
-					return JSON.parse(stored);
-				} catch (err) {
-					console.error("Failed to parse localStorage timestamps:", err);
-				}
-			}
-		}
-		return {};
-	});
 	const router = useRouter();
 
 	const {
@@ -56,15 +48,13 @@ export default function AdminOverview() {
 	};
 
 	const getNewSubmissionsCount = (
-		endpoint: string,
-		latestSubmissionAt: Date | null
+		latestSubmissionAt: Date | null,
+		lastViewedAt: Date | null
 	) => {
 		if (!latestSubmissionAt) return 0;
+		if (!lastViewedAt) return 1; // If never viewed, consider all as new
 
-		const lastViewed = lastViewedTimestamps[endpoint];
-		if (!lastViewed) return 1; // If never viewed, consider all as new
-
-		const lastViewedTime = new Date(lastViewed).getTime();
+		const lastViewedTime = new Date(lastViewedAt).getTime();
 		const latestTime = new Date(latestSubmissionAt).getTime();
 
 		return latestTime > lastViewedTime ? 1 : 0;
@@ -76,11 +66,15 @@ export default function AdminOverview() {
 	};
 
 	const stats = {
-		totalSubmissions: endpoints.reduce((sum, ep) => sum + ep.count, 0),
+		totalSubmissions: endpoints.reduce(
+			(sum: number, ep: EndpointSummaryItem) => sum + ep.count,
+			0
+		),
 		endpoints: endpoints.length,
 		newLeads: endpoints.reduce(
-			(sum, ep) =>
-				sum + getNewSubmissionsCount(ep.endpoint_name, ep.latest_submission_at),
+			(sum: number, ep: EndpointSummaryItem) =>
+				sum +
+				getNewSubmissionsCount(ep.latest_submission_at, ep.last_viewed_at),
 			0
 		),
 	};
@@ -209,10 +203,10 @@ export default function AdminOverview() {
 					</div>
 				) : (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{endpoints.map((endpoint) => {
+						{endpoints.map((endpoint: EndpointSummaryItem) => {
 							const newCount = getNewSubmissionsCount(
-								endpoint.endpoint_name,
-								endpoint.latest_submission_at
+								endpoint.latest_submission_at,
+								endpoint.last_viewed_at
 							);
 							const hasNew = newCount > 0;
 

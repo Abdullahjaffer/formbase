@@ -384,7 +384,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  Submission: 'Submission'
+  Submission: 'Submission',
+  EndpointView: 'EndpointView'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -400,7 +401,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "submission"
+    modelProps: "submission" | "endpointView"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -478,6 +479,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EndpointView: {
+      payload: Prisma.$EndpointViewPayload<ExtArgs>
+      fields: Prisma.EndpointViewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EndpointViewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EndpointViewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>
+        }
+        findFirst: {
+          args: Prisma.EndpointViewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EndpointViewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>
+        }
+        findMany: {
+          args: Prisma.EndpointViewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>[]
+        }
+        create: {
+          args: Prisma.EndpointViewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>
+        }
+        createMany: {
+          args: Prisma.EndpointViewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EndpointViewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>[]
+        }
+        delete: {
+          args: Prisma.EndpointViewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>
+        }
+        update: {
+          args: Prisma.EndpointViewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>
+        }
+        deleteMany: {
+          args: Prisma.EndpointViewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EndpointViewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EndpointViewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>[]
+        }
+        upsert: {
+          args: Prisma.EndpointViewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EndpointViewPayload>
+        }
+        aggregate: {
+          args: Prisma.EndpointViewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEndpointView>
+        }
+        groupBy: {
+          args: Prisma.EndpointViewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EndpointViewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EndpointViewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EndpointViewCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -527,6 +602,15 @@ export const SubmissionScalarFieldEnum = {
 } as const
 
 export type SubmissionScalarFieldEnum = (typeof SubmissionScalarFieldEnum)[keyof typeof SubmissionScalarFieldEnum]
+
+
+export const EndpointViewScalarFieldEnum = {
+  endpoint_name: 'endpoint_name',
+  username: 'username',
+  last_viewed_at: 'last_viewed_at'
+} as const
+
+export type EndpointViewScalarFieldEnum = (typeof EndpointViewScalarFieldEnum)[keyof typeof EndpointViewScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -726,6 +810,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   submission?: Prisma.SubmissionOmit
+  endpointView?: Prisma.EndpointViewOmit
 }
 
 /* Types for Logging */

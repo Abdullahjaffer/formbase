@@ -4,6 +4,7 @@ import {
 	getSubmissionById,
 	getSubmissions,
 	getSubmissionsByEndpoint,
+	updateLastViewed,
 } from "@/app/admin/actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -64,6 +65,19 @@ export function useDeleteSubmission() {
 			queryClient.removeQueries({
 				queryKey: queryKeys.submissionById(deletedId),
 			});
+		},
+	});
+}
+
+// Hook for updating last viewed timestamp
+export function useUpdateLastViewed() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: updateLastViewed,
+		onSuccess: () => {
+			// Invalidate endpoint summary to refresh "new" badges
+			queryClient.invalidateQueries({ queryKey: queryKeys.endpointSummary });
 		},
 	});
 }

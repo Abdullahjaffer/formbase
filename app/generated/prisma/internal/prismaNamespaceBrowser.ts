@@ -51,7 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Submission: 'Submission'
+  Submission: 'Submission',
+  EndpointView: 'EndpointView'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -80,6 +81,15 @@ export const SubmissionScalarFieldEnum = {
 } as const
 
 export type SubmissionScalarFieldEnum = (typeof SubmissionScalarFieldEnum)[keyof typeof SubmissionScalarFieldEnum]
+
+
+export const EndpointViewScalarFieldEnum = {
+  endpoint_name: 'endpoint_name',
+  username: 'username',
+  last_viewed_at: 'last_viewed_at'
+} as const
+
+export type EndpointViewScalarFieldEnum = (typeof EndpointViewScalarFieldEnum)[keyof typeof EndpointViewScalarFieldEnum]
 
 
 export const SortOrder = {

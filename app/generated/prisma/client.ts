@@ -44,3 +44,8 @@ export { Prisma }
  * 
  */
 export type Submission = Prisma.SubmissionModel
+/**
+ * Model EndpointView
+ * 
+ */
+export type EndpointView = Prisma.EndpointViewModel

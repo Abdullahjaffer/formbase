@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider               = \"prisma-client\"\n  output                 = \"../app/generated/prisma\"\n  moduleFormat           = \"esm\"\n  generatedFileExtension = \"ts\"\n  importFileExtension    = \"ts\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Submission {\n  id            String   @id @default(uuid()) @db.Uuid\n  endpoint_name String   @db.VarChar(255)\n  data          Json     @db.JsonB\n  browser_info  Json     @db.JsonB\n  created_at    DateTime @default(now()) @map(\"created_at\")\n  ip_address    String?  @db.VarChar(45) // IPv6 addresses can be up to 45 chars\n\n  @@map(\"submissions\")\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider               = \"prisma-client\"\n  output                 = \"../app/generated/prisma\"\n  moduleFormat           = \"esm\"\n  generatedFileExtension = \"ts\"\n  importFileExtension    = \"ts\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Submission {\n  id            String   @id @default(uuid()) @db.Uuid\n  endpoint_name String   @db.VarChar(255)\n  data          Json     @db.JsonB\n  browser_info  Json     @db.JsonB\n  created_at    DateTime @default(now()) @map(\"created_at\")\n  ip_address    String?  @db.VarChar(45) // IPv6 addresses can be up to 45 chars\n\n  @@map(\"submissions\")\n}\n\nmodel EndpointView {\n  endpoint_name  String   @db.VarChar(255)\n  username       String   @db.VarChar(255)\n  last_viewed_at DateTime @default(now()) @updatedAt @map(\"last_viewed_at\")\n\n  @@id([endpoint_name, username])\n  @@map(\"endpoint_views\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Submission\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"endpoint_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"data\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"browser_info\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"ip_address\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":\"submissions\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Submission\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"endpoint_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"data\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"browser_info\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"ip_address\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":\"submissions\"},\"EndpointView\":{\"fields\":[{\"name\":\"endpoint_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"last_viewed_at\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"last_viewed_at\"}],\"dbName\":\"endpoint_views\"}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -183,6 +183,16 @@ export interface PrismaClient<
     * ```
     */
   get submission(): Prisma.SubmissionDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.endpointView`: Exposes CRUD operations for the **EndpointView** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EndpointViews
+    * const endpointViews = await prisma.endpointView.findMany()
+    * ```
+    */
+  get endpointView(): Prisma.EndpointViewDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

@@ -23,3 +23,12 @@ model Submission {
 
   @@map("submissions")
 }
+
+model EndpointView {
+  endpoint_name  String   @db.VarChar(255)
+  username       String   @db.VarChar(255)
+  last_viewed_at DateTime @default(now()) @updatedAt @map("last_viewed_at")
+
+  @@id([endpoint_name, username])
+  @@map("endpoint_views")
+}
