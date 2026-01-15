@@ -28,6 +28,10 @@ export default function AdminLogin() {
 			});
 
 			if (response.ok) {
+				// Refresh the router to ensure cookie is recognized
+				router.refresh();
+				// Use a small delay to ensure cookie is set before navigation
+				await new Promise((resolve) => setTimeout(resolve, 100));
 				router.push("/admin");
 			} else {
 				const data = await response.json();
