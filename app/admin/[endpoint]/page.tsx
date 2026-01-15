@@ -24,8 +24,8 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { exportSubmissionsToCSV } from "../actions";
 import { ThemeToggle } from "../../components/ThemeToggle";
+import { exportSubmissionsToCSV } from "../actions";
 
 export default function AdminEndpointDashboard() {
 	const [showBrowserInfo, setShowBrowserInfo] = useState(false);
@@ -172,99 +172,105 @@ export default function AdminEndpointDashboard() {
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-zinc-950 pb-12 transition-colors duration-300">
 			{/* Header */}
-			<div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm">
+			<div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-20 shadow-sm">
 				<div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex flex-col md:flex-row md:items-center justify-between py-4 gap-4">
-						<div className="flex items-center gap-4">
-							<Link
-								href="/admin"
-								className="flex items-center gap-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-							>
-								<ArrowLeft className="w-4 h-4" />
-								<span className="text-sm font-medium">Back to Overview</span>
-							</Link>
-							<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg">
-								<LayoutDashboard className="w-6 h-6 text-white" />
+					<div className="flex flex-col lg:flex-row lg:items-center justify-between py-4 gap-4">
+						<div className="flex flex-col sm:flex-row sm:items-center gap-4">
+							<div className="flex items-center justify-between w-full sm:w-auto gap-4">
+								<Link
+									href="/admin"
+									className="flex items-center gap-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0"
+								>
+									<ArrowLeft className="w-4 h-4" />
+									<span className="text-sm font-medium hidden sm:inline">
+										Back
+									</span>
+								</Link>
+								<div className="flex items-center gap-3">
+									<div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-100 dark:shadow-none shadow-lg shrink-0">
+										<LayoutDashboard className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+									</div>
+									<div className="min-w-0">
+										<h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white leading-tight truncate">
+											{endpoint}
+										</h1>
+										<p className="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400 font-medium">
+											Endpoint Dashboard
+										</p>
+									</div>
+								</div>
+								<button
+									onClick={handleRefresh}
+									disabled={isRefreshing}
+									className="sm:ml-2 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
+								>
+									<RefreshCw
+										className={`w-3.5 h-3.5 ${
+											isRefreshing ? "animate-spin" : ""
+										}`}
+									/>
+									<span className="hidden sm:inline">Refresh</span>
+								</button>
 							</div>
-							<div>
-								<h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
-									Endpoint: {endpoint}
-								</h1>
-								<p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
-									FormBase Control Panel
-								</p>
-							</div>
-							<button
-								onClick={handleRefresh}
-								disabled={isRefreshing}
-								className="ml-2 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
-							>
-								<RefreshCw
-									className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
-								/>
-								{isRefreshing ? "Refreshing..." : "Refresh"}
-							</button>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-3">
-							<div className="relative flex-1 md:flex-none min-w-[200px]">
+						<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+							<div className="relative flex-1">
 								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<Search className="h-4 w-4 text-gray-400" />
 								</div>
 								<input
 									type="text"
-									placeholder="Search submissions..."
+									placeholder="Search..."
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
-									className="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-black focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
+									className="block w-full pl-10 pr-3 py-2.5 sm:py-2 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-black focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
 								/>
 							</div>
 
-							<button
-								onClick={handleExport}
-								disabled={isExporting || submissions.length === 0}
-								className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
-							>
-								{isExporting ? (
-									<RefreshCw className="w-4 h-4 animate-spin" />
-								) : (
-									<Download className="w-4 h-4" />
-								)}
-								<span>Export CSV</span>
-							</button>
+							<div className="flex items-center gap-2">
+								<button
+									onClick={handleExport}
+									disabled={isExporting || submissions.length === 0}
+									className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-2.5 sm:py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800 min-h-[40px]"
+								>
+									{isExporting ? (
+										<RefreshCw className="w-3.5 h-3.5 animate-spin" />
+									) : (
+										<Download className="w-3.5 h-3.5" />
+									)}
+									<span>Export</span>
+								</button>
 
-							<div className="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 border border-gray-200 dark:border-zinc-700">
 								<button
 									onClick={() => setShowBrowserInfo(!showBrowserInfo)}
-									className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+									className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 sm:py-2 rounded-lg text-xs font-bold transition-all border min-h-[40px] ${
 										showBrowserInfo
-											? "bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
-											: "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200"
+											? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+											: "bg-white dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-800 hover:text-gray-700 dark:hover:text-zinc-200"
 									}`}
 								>
 									{showBrowserInfo ? (
-										<>
-											<EyeOff className="w-3.5 h-3.5" />
-											Hide Browser
-										</>
+										<EyeOff className="w-3.5 h-3.5" />
 									) : (
-										<>
-											<Eye className="w-3.5 h-3.5" />
-											Show Browser
-										</>
+										<Eye className="w-3.5 h-3.5" />
 									)}
+									<span>Browser</span>
 								</button>
 							</div>
 
-							<ThemeToggle />
-
-							<button
-								onClick={handleLogout}
-								className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2 rounded-lg text-sm font-bold transition-all"
-							>
-								<LogOut className="w-4 h-4" />
-								Logout
-							</button>
+							<div className="flex items-center gap-2">
+								<div className="flex-1 sm:flex-none flex justify-center">
+									<ThemeToggle />
+								</div>
+								<button
+									onClick={handleLogout}
+									className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900 text-gray-700 dark:text-zinc-300 px-4 py-2.5 sm:py-2 rounded-lg text-xs font-bold transition-all min-h-[40px]"
+								>
+									<LogOut className="w-3.5 h-3.5" />
+									Logout
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -303,21 +309,23 @@ export default function AdminEndpointDashboard() {
 
 				{/* Form URL Section */}
 				<div className="mb-8">
-					<div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-6">
-						<div className="flex items-center gap-3">
-							<span className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
+					<div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 p-4 sm:p-6">
+						<div className="flex flex-col sm:flex-row sm:items-center gap-3">
+							<span className="text-sm text-gray-500 dark:text-zinc-400 font-bold sm:font-medium">
 								Form URL:
 							</span>
-							<div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 flex-1">
-								<code className="text-xs font-mono text-gray-700 dark:text-zinc-300 flex-1">
-									{`${window.location.origin}/api/${endpoint}`}
+							<div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-800 px-3 py-2 sm:py-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 flex-1 min-w-0">
+								<code className="text-[10px] sm:text-xs font-mono text-gray-700 dark:text-zinc-300 flex-1 truncate">
+									{`${
+										typeof window !== "undefined" ? window.location.origin : ""
+									}/api/${endpoint}`}
 								</code>
 								<button
 									onClick={handleCopyUrl}
-									className="p-1 text-gray-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition-all"
+									className="p-1.5 text-gray-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition-all shrink-0"
 									title="Copy URL to clipboard"
 								>
-									<Copy className="w-3.5 h-3.5" />
+									<Copy className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
 								</button>
 							</div>
 						</div>
@@ -358,12 +366,12 @@ export default function AdminEndpointDashboard() {
 						)}
 					</div>
 				) : (
-					<div className="bg-white dark:bg-zinc-900 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800 rounded-3xl overflow-hidden transition-all">
-						<div className="overflow-x-auto">
+					<div className="bg-white dark:bg-zinc-900 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800 rounded-3xl overflow-hidden transition-all relative">
+						<div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-zinc-800">
 							<table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800 border-collapse">
 								<thead className="bg-gray-50/50 dark:bg-zinc-950/50">
 									<tr>
-										<th className="px-6 py-4 text-left text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky left-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-20 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+										<th className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky left-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-30 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
 											Timestamp
 										</th>
 										{(() => {
@@ -394,7 +402,7 @@ export default function AdminEndpointDashboard() {
 													{dataKeys.map((key) => (
 														<th
 															key={`data-${key}`}
-															className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest border-r border-gray-100/30 dark:border-zinc-800/30"
+															className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest border-r border-gray-100/30 dark:border-zinc-800/30 min-w-[150px]"
 														>
 															{key}
 														</th>
@@ -403,12 +411,12 @@ export default function AdminEndpointDashboard() {
 														browserKeys.map((key) => (
 															<th
 																key={`browser-${key}`}
-																className="px-6 py-4 text-left text-xs font-bold text-indigo-400 dark:text-indigo-300 uppercase tracking-widest italic bg-indigo-50/30 dark:bg-indigo-900/10 border-r border-gray-100/30 dark:border-zinc-800/30"
+																className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-indigo-400 dark:text-indigo-300 uppercase tracking-widest italic bg-indigo-50/30 dark:bg-indigo-900/10 border-r border-gray-100/30 dark:border-zinc-800/30 min-w-[150px]"
 															>
 																{key}
 															</th>
 														))}
-													<th className="px-6 py-4 text-left text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky right-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-20 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
+													<th className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky right-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-30 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
 														Actions
 													</th>
 												</>
@@ -445,7 +453,7 @@ export default function AdminEndpointDashboard() {
 												key={sub.id}
 												className="group hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all duration-200"
 											>
-												<td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500 dark:text-zinc-400 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-10 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+												<td className="px-4 sm:px-6 py-4 sm:py-5 whitespace-nowrap text-[10px] font-medium text-gray-500 dark:text-zinc-400 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-20 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
 													<div className="flex flex-col">
 														<span>
 															{new Date(sub.created_at).toLocaleDateString()}
@@ -458,7 +466,7 @@ export default function AdminEndpointDashboard() {
 												{dataKeys.map((key) => (
 													<td
 														key={`${sub.id}-data-${key}`}
-														className="px-6 py-5 text-sm text-gray-700 dark:text-zinc-300 font-medium border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[300px] truncate"
+														className="px-4 sm:px-6 py-4 sm:py-5 text-sm text-gray-700 dark:text-zinc-300 font-medium border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[200px] sm:max-w-[300px] truncate"
 														title={(() => {
 															const dataObj =
 																typeof sub.data === "object" &&
@@ -477,7 +485,7 @@ export default function AdminEndpointDashboard() {
 															const value = dataObj[key];
 															return value !== null && value !== undefined ? (
 																typeof value === "object" ? (
-																	<code className="text-xs bg-gray-50 dark:bg-zinc-800 p-1 rounded font-mono truncate block text-gray-600 dark:text-zinc-400">
+																	<code className="text-[10px] bg-gray-50 dark:bg-zinc-800 p-1 rounded font-mono truncate block text-gray-600 dark:text-zinc-400">
 																		{JSON.stringify(value)}
 																	</code>
 																) : (
@@ -495,7 +503,7 @@ export default function AdminEndpointDashboard() {
 													browserKeys.map((key) => (
 														<td
 															key={`${sub.id}-browser-${key}`}
-															className="px-6 py-5 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50/10 dark:bg-indigo-900/5 group-hover:bg-indigo-50/30 dark:group-hover:bg-indigo-900/10 transition-colors border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[200px] truncate"
+															className="px-4 sm:px-6 py-4 sm:py-5 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50/10 dark:bg-indigo-900/5 group-hover:bg-indigo-50/30 dark:group-hover:bg-indigo-900/10 transition-colors border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[150px] sm:max-w-[200px] truncate"
 															title={(() => {
 																const browserObj =
 																	typeof sub.browser_info === "object" &&
@@ -528,10 +536,10 @@ export default function AdminEndpointDashboard() {
 															})()}
 														</td>
 													))}
-												<td className="px-6 py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-10 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
-													<div className="flex items-center gap-3">
+												<td className="px-4 sm:px-6 py-4 sm:py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-20 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
+													<div className="flex items-center gap-2 sm:gap-3">
 														{sub.ip_address && (
-															<span className="text-[10px] bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-mono font-bold">
+															<span className="hidden sm:inline-block text-[10px] bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-mono font-bold">
 																{sub.ip_address}
 															</span>
 														)}
@@ -540,14 +548,14 @@ export default function AdminEndpointDashboard() {
 															className="p-2 text-gray-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
 															title="View details"
 														>
-															<Eye className="w-5 h-5" />
+															<Eye className="w-5 h-5 sm:w-5 sm:h-5" />
 														</Link>
 														<button
 															onClick={() => handleDelete(sub.id)}
 															className="p-2 text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
 															title="Delete entry"
 														>
-															<Trash2 className="w-5 h-5" />
+															<Trash2 className="w-5 h-5 sm:w-5 sm:h-5" />
 														</button>
 													</div>
 												</td>
@@ -557,12 +565,11 @@ export default function AdminEndpointDashboard() {
 								</tbody>
 							</table>
 						</div>
-						<div className="bg-gray-50/80 dark:bg-zinc-950/80 px-6 py-4 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">
+						<div className="bg-gray-50/80 dark:bg-zinc-950/80 px-4 sm:px-6 py-4 border-t border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">
 							<span>
 								Showing {filteredSubmissions.length} of {stats.total} total
-								submissions
 							</span>
-							<span>End of data for {endpoint}</span>
+							<span>{endpoint} Dashboard</span>
 						</div>
 					</div>
 				)}

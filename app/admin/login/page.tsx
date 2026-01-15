@@ -41,21 +41,21 @@ export default function AdminLogin() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-			<div className="absolute top-8 right-8">
+		<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+			<div className="absolute top-4 right-4 sm:top-8 sm:right-8">
 				<ThemeToggle />
 			</div>
-			<div className="max-w-md w-full space-y-8 bg-white dark:bg-zinc-900 p-10 rounded-3xl shadow-xl border border-gray-100 dark:border-zinc-800">
+			<div className="max-w-md w-full space-y-8 bg-white dark:bg-zinc-900 p-6 sm:p-10 rounded-3xl shadow-xl border border-gray-100 dark:border-zinc-800">
 				<div>
 					<div className="flex justify-center">
 						<div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
 							<Layers className="w-8 h-8 text-white" />
 						</div>
 					</div>
-					<h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+					<h2 className="mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
 						Admin Login
 					</h2>
-					<p className="mt-2 text-center text-sm text-gray-600 dark:text-zinc-400 font-medium">
+					<p className="mt-2 text-center text-xs sm:text-sm text-gray-600 dark:text-zinc-400 font-medium">
 						Sign in to access the FormBase control panel
 					</p>
 				</div>
@@ -70,7 +70,10 @@ export default function AdminLogin() {
 								name="username"
 								type="text"
 								required
-								className="appearance-none relative block w-full px-4 py-3 border border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all"
+								autoComplete="username"
+								autoCapitalize="none"
+								autoCorrect="off"
+								className="appearance-none relative block w-full px-4 py-3 sm:py-3 border border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-base sm:text-sm transition-all min-h-[48px]"
 								placeholder="Username"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
@@ -85,14 +88,15 @@ export default function AdminLogin() {
 								name="password"
 								type={showPassword ? "text" : "password"}
 								required
-								className="appearance-none relative block w-full px-4 py-3 border border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all pr-12 -mt-px"
+								autoComplete="current-password"
+								className="appearance-none relative block w-full px-4 py-3 sm:py-3 border border-gray-200 dark:border-zinc-800 placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-zinc-900 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-base sm:text-sm transition-all pr-12 -mt-px min-h-[48px]"
 								placeholder="Password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 							/>
 							<button
 								type="button"
-								className="absolute inset-y-0 right-0 pr-4 flex items-center z-20 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+								className="absolute inset-y-0 right-0 pr-4 flex items-center z-20 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors min-w-[44px] justify-center"
 								onClick={() => setShowPassword(!showPassword)}
 							>
 								{showPassword ? (
