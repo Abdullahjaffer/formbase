@@ -57,7 +57,7 @@ export function SubmissionsTimeChart({ data }: Props) {
 							tickLine={false}
 							tick={{ fontSize: 10, fill: "#94a3b8" }}
 							minTickGap={30}
-							formatter={(value: string) =>
+							tickFormatter={(value: string) =>
 								new Date(value).toLocaleDateString(undefined, {
 									month: "short",
 									day: "numeric",

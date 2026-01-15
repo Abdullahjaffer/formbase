@@ -289,24 +289,27 @@ export async function getAnalyticsData(days: number = 30) {
 				(endpointPerfMap.get(sub.endpoint_name) || 0) + 1
 			);
 
-			const browserInfo = (sub.browser_info as Record<string, any>) || {};
+			const browserInfo = (sub.browser_info as Record<string, unknown>) || {};
 
 			// Country
-			const country = browserInfo.country || "Unknown";
+			const country = (browserInfo.country as string) || "Unknown";
 			countryMap.set(country, (countryMap.get(country) || 0) + 1);
 
 			// Device Type (Mobile/Desktop)
 			const isMobile =
 				browserInfo.mobile === "true" ||
-				/mobile|android|iphone|ipad|phone/i.test(browserInfo.userAgent || "");
+				/mobile|android|iphone|ipad|phone/i.test(
+					(browserInfo.userAgent as string) || ""
+				);
 			const deviceType = isMobile ? "Mobile" : "Desktop";
 			deviceMap.set(deviceType, (deviceMap.get(deviceType) || 0) + 1);
 
 			// Browser Name
-			const ua = browserInfo.userAgent || "";
+			const ua = (browserInfo.userAgent as string) || "";
 			let browserName = "Other";
 			if (/chrome/i.test(ua)) browserName = "Chrome";
-			else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browserName = "Safari";
+			else if (/safari/i.test(ua) && !/chrome/i.test(ua))
+				browserName = "Safari";
 			else if (/firefox/i.test(ua)) browserName = "Firefox";
 			else if (/edg/i.test(ua)) browserName = "Edge";
 			browserMap.set(browserName, (browserMap.get(browserName) || 0) + 1);

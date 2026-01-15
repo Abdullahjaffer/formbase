@@ -1,3 +1,4 @@
+import { Submission } from "@/app/generated/prisma/client";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -10,7 +11,7 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-export async function sendSubmissionNotification(submission: any) {
+export async function sendSubmissionNotification(submission: Submission) {
 	const { endpoint_name, data, browser_info, created_at, ip_address } =
 		submission;
 	const adminEmail = process.env.ADMIN_EMAIL;
@@ -21,7 +22,8 @@ export async function sendSubmissionNotification(submission: any) {
 		return;
 	}
 
-	const formDataHtml = Object.entries(data || {})
+	const dataObj = (data as Record<string, unknown>) || {};
+	const formDataHtml = Object.entries(dataObj)
 		.map(
 			([key, value]) =>
 				`<li><strong>${key}:</strong> ${
@@ -30,10 +32,10 @@ export async function sendSubmissionNotification(submission: any) {
 		)
 		.join("");
 
-	const browserInfo = (browser_info as Record<string, any>) || {};
-	const country = browserInfo.country || "Unknown";
-	const platform = browserInfo.platform || "Unknown";
-	const userAgent = browserInfo.userAgent || "Unknown";
+	const browserInfo = (browser_info as Record<string, unknown>) || {};
+	const country = (browserInfo.country as string) || "Unknown";
+	const platform = (browserInfo.platform as string) || "Unknown";
+	const userAgent = (browserInfo.userAgent as string) || "Unknown";
 
 	const adminUrl = `${appUrl}/admin/${endpoint_name}/${submission.id}`;
 
@@ -49,7 +51,7 @@ Timestamp: ${new Date(created_at).toLocaleString()}
 IP Address: ${ip_address}
 
 Form Data:
-${Object.entries(data || {})
+${Object.entries(dataObj)
 	.map(([key, value]) => `- ${key}: ${value}`)
 	.join("\n")}
 
