@@ -1,5 +1,6 @@
 import {
 	deleteSubmission,
+	getAnalyticsData,
 	getEndpointSummary,
 	getSubmissionById,
 	getSubmissions,
@@ -12,6 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const queryKeys = {
 	submissions: ["submissions"] as const,
 	endpointSummary: ["endpoint-summary"] as const,
+	analytics: (days: number) => ["analytics", days] as const,
 	submissionsByEndpoint: (endpoint: string) =>
 		["submissions", endpoint] as const,
 	submissionById: (id: string) => ["submission", id] as const,
@@ -48,6 +50,14 @@ export function useSubmissionById(id: string) {
 		queryKey: queryKeys.submissionById(id),
 		queryFn: () => getSubmissionById(id),
 		enabled: !!id, // Only run if id is provided
+	});
+}
+
+// Hook for fetching analytics data
+export function useAnalyticsData(days: number = 30) {
+	return useQuery({
+		queryKey: queryKeys.analytics(days),
+		queryFn: () => getAnalyticsData(days),
 	});
 }
 

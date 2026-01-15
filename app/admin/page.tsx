@@ -1,9 +1,10 @@
 "use client";
 
-import { useEndpointSummary } from "@/lib/admin-hooks";
+import { useAnalyticsData, useEndpointSummary } from "@/lib/admin-hooks";
 import {
 	AlertCircle,
 	ArrowRight,
+	BarChart3,
 	Clock,
 	Inbox,
 	LayoutDashboard,
@@ -14,6 +15,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { DeviceBrowserChart } from "../components/analytics/DeviceBrowserChart";
+import { GeographicChart } from "../components/analytics/GeographicChart";
+import { SubmissionsTimeChart } from "../components/analytics/SubmissionsTimeChart";
 import { ThemeToggle } from "../components/ThemeToggle";
 
 interface EndpointSummaryItem {
@@ -25,6 +30,7 @@ interface EndpointSummaryItem {
 
 export default function AdminOverview() {
 	const router = useRouter();
+	const [days, setDays] = useState(30);
 
 	const {
 		data: endpoints = [],
@@ -33,6 +39,12 @@ export default function AdminOverview() {
 		error,
 		refetch,
 	} = useEndpointSummary();
+
+	const {
+		data: analytics,
+		isLoading: analyticsLoading,
+		error: analyticsError,
+	} = useAnalyticsData(days);
 
 	const handleRefresh = () => {
 		refetch();
@@ -176,6 +188,76 @@ export default function AdminOverview() {
 							</p>
 						</div>
 					</div>
+				</div>
+
+				{/* Analytics Section */}
+				<div className="mb-12">
+					<div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+						<div className="flex items-center gap-3">
+							<div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg">
+								<BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+							</div>
+							<h2 className="text-xl font-bold text-gray-900 dark:text-white">
+								Analytics Dashboard
+							</h2>
+						</div>
+
+						<div className="flex items-center bg-white dark:bg-zinc-900 rounded-xl p-1 shadow-sm border border-gray-100 dark:border-zinc-800">
+							{[7, 30, 90].map((d) => (
+								<button
+									key={d}
+									onClick={() => setDays(d)}
+									className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+										days === d
+											? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none"
+											: "text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white"
+									}`}
+								>
+									Last {d} Days
+								</button>
+							))}
+						</div>
+					</div>
+
+					{analyticsLoading ? (
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div className="lg:col-span-2 h-[350px] bg-white dark:bg-zinc-900 rounded-2xl animate-pulse border border-gray-100 dark:border-zinc-800" />
+							<div className="h-[350px] bg-white dark:bg-zinc-900 rounded-2xl animate-pulse border border-gray-100 dark:border-zinc-800" />
+							<div className="h-[350px] bg-white dark:bg-zinc-900 rounded-2xl animate-pulse border border-gray-100 dark:border-zinc-800" />
+						</div>
+					) : analyticsError ? (
+						<div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-2xl p-8 text-center">
+							<AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+							<p className="text-red-800 dark:text-red-300 font-bold">
+								Failed to load analytics
+							</p>
+							<p className="text-red-600 dark:text-red-400 text-sm mt-1">
+								{analyticsError instanceof Error
+									? analyticsError.message
+									: "An unexpected error occurred"}
+							</p>
+						</div>
+					) : analytics ? (
+						<div className="space-y-6">
+							<SubmissionsTimeChart data={analytics.timeSeries} />
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+								<GeographicChart data={analytics.geographic} />
+								<DeviceBrowserChart
+									devices={analytics.devices}
+									browsers={analytics.browsers}
+								/>
+							</div>
+						</div>
+					) : null}
+				</div>
+
+				<div className="flex items-center gap-3 mb-6">
+					<div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg">
+						<Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+					</div>
+					<h2 className="text-xl font-bold text-gray-900 dark:text-white">
+						Active Endpoints
+					</h2>
 				</div>
 
 				{error && (

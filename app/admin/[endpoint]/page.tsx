@@ -9,6 +9,7 @@ import {
 	AlertCircle,
 	ArrowLeft,
 	Copy,
+	Download,
 	Eye,
 	EyeOff,
 	Inbox,
@@ -23,11 +24,13 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { exportSubmissionsToCSV } from "../actions";
 import { ThemeToggle } from "../../components/ThemeToggle";
 
 export default function AdminEndpointDashboard() {
 	const [showBrowserInfo, setShowBrowserInfo] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [isExporting, setIsExporting] = useState(false);
 	const router = useRouter();
 	const params = useParams();
 	const endpoint = params.endpoint as string;
@@ -86,6 +89,34 @@ export default function AdminEndpointDashboard() {
 			textArea.select();
 			document.execCommand("copy");
 			document.body.removeChild(textArea);
+		}
+	};
+
+	const handleExport = async () => {
+		setIsExporting(true);
+		try {
+			const csv = await exportSubmissionsToCSV(endpoint);
+			if (!csv) {
+				alert("No data to export");
+				return;
+			}
+			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.setAttribute("href", url);
+			link.setAttribute(
+				"download",
+				`submissions_${endpoint}_${new Date().toISOString()}.csv`
+			);
+			link.style.visibility = "hidden";
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		} catch (err) {
+			console.error("Failed to export:", err);
+			alert("Failed to export submissions");
+		} finally {
+			setIsExporting(false);
 		}
 	};
 
@@ -188,6 +219,19 @@ export default function AdminEndpointDashboard() {
 									className="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-black focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
 								/>
 							</div>
+
+							<button
+								onClick={handleExport}
+								disabled={isExporting || submissions.length === 0}
+								className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 border border-indigo-100 dark:border-indigo-800"
+							>
+								{isExporting ? (
+									<RefreshCw className="w-4 h-4 animate-spin" />
+								) : (
+									<Download className="w-4 h-4" />
+								)}
+								<span>Export CSV</span>
+							</button>
 
 							<div className="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 border border-gray-200 dark:border-zinc-700">
 								<button
