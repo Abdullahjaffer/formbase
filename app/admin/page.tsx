@@ -331,7 +331,7 @@ export default function AdminOverview() {
 									</div>
 
 									<div className="space-y-3">
-										<h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight">
+										<h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight truncate">
 											{endpoint.endpoint_name}
 										</h3>
 

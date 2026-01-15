@@ -2,6 +2,7 @@
 
 import {
 	useDeleteSubmission,
+	useEndpointSummary,
 	useSubmissionsByEndpoint,
 	useUpdateLastViewed,
 } from "@/lib/admin-hooks";
@@ -42,6 +43,22 @@ export default function AdminEndpointDashboard() {
 		error,
 		refetch,
 	} = useSubmissionsByEndpoint(endpoint);
+
+	const { data: endpoints = [] } = useEndpointSummary();
+	const [viewThreshold, setViewThreshold] = useState<string | null>(null);
+
+	const currentEndpoint = endpoints.find((e) => e.endpoint_name === endpoint);
+
+	useEffect(() => {
+		if (currentEndpoint && viewThreshold === null) {
+			setViewThreshold(
+				currentEndpoint.last_viewed_at
+					? new Date(currentEndpoint.last_viewed_at).toISOString()
+					: new Date(0).toISOString()
+			);
+		}
+	}, [currentEndpoint, viewThreshold]);
+
 	const deleteMutation = useDeleteSubmission();
 	const updateLastViewedMutation = useUpdateLastViewed();
 
@@ -371,7 +388,7 @@ export default function AdminEndpointDashboard() {
 							<table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800 border-collapse">
 								<thead className="bg-gray-50/50 dark:bg-zinc-950/50">
 									<tr>
-										<th className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky left-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-30 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+										<th className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sm:sticky sm:left-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-30 border-r border-gray-100/50 dark:border-zinc-800/50 sm:shadow-[1px_0_0_rgba(0,0,0,0.05)]">
 											Timestamp
 										</th>
 										{(() => {
@@ -416,7 +433,7 @@ export default function AdminEndpointDashboard() {
 																{key}
 															</th>
 														))}
-													<th className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sticky right-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-30 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
+													<th className="px-4 sm:px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest sm:sticky sm:right-0 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-sm z-30 border-l border-gray-100 dark:border-zinc-800 sm:shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
 														Actions
 													</th>
 												</>
@@ -448,119 +465,192 @@ export default function AdminEndpointDashboard() {
 											)
 										);
 
-										return filteredSubmissions.map((sub) => (
-											<tr
-												key={sub.id}
-												className="group hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all duration-200"
-											>
-												<td className="px-4 sm:px-6 py-4 sm:py-5 whitespace-nowrap text-[10px] font-medium text-gray-500 dark:text-zinc-400 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-20 border-r border-gray-100/50 dark:border-zinc-800/50 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
-													<div className="flex flex-col">
-														<span>
-															{new Date(sub.created_at).toLocaleDateString()}
-														</span>
-														<span className="text-[10px] text-gray-400 dark:text-zinc-500">
-															{new Date(sub.created_at).toLocaleTimeString()}
-														</span>
-													</div>
-												</td>
-												{dataKeys.map((key) => (
+										return filteredSubmissions.map((sub) => {
+											const isNew =
+												viewThreshold &&
+												new Date(sub.created_at).getTime() >
+													new Date(viewThreshold).getTime();
+
+											return (
+												<tr
+													key={sub.id}
+													className={`group transition-all duration-200 ${
+														isNew
+															? "bg-green-50/40 dark:bg-green-900/10 hover:bg-green-50/60 dark:hover:bg-green-900/20"
+															: "hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10"
+													}`}
+												>
 													<td
-														key={`${sub.id}-data-${key}`}
-														className="px-4 sm:px-6 py-4 sm:py-5 text-sm text-gray-700 dark:text-zinc-300 font-medium border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[200px] sm:max-w-[300px] truncate"
-														title={(() => {
-															const dataObj =
-																typeof sub.data === "object" &&
-																sub.data !== null
-																	? (sub.data as Record<string, unknown>)
-																	: {};
-															return String(dataObj[key] || "");
-														})()}
+														className={`px-4 sm:px-6 py-4 sm:py-5 whitespace-nowrap text-[10px] font-medium sm:sticky sm:left-0 transition-colors z-20 border-r border-gray-100/50 dark:border-zinc-800/50 sm:shadow-[1px_0_0_rgba(0,0,0,0.05)] ${
+															isNew
+																? "bg-green-50/40 dark:bg-green-900/10 group-hover:bg-green-50/60 dark:group-hover:bg-green-900/20 text-green-700 dark:text-green-400"
+																: "bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 text-gray-500 dark:text-zinc-400"
+														}`}
 													>
-														{(() => {
-															const dataObj =
-																typeof sub.data === "object" &&
-																sub.data !== null
-																	? (sub.data as Record<string, unknown>)
-																	: {};
-															const value = dataObj[key];
-															return value !== null && value !== undefined ? (
-																typeof value === "object" ? (
-																	<code className="text-[10px] bg-gray-50 dark:bg-zinc-800 p-1 rounded font-mono truncate block text-gray-600 dark:text-zinc-400">
-																		{JSON.stringify(value)}
-																	</code>
-																) : (
-																	String(value)
-																)
-															) : (
-																<span className="text-gray-300 dark:text-zinc-700">
-																	—
-																</span>
-															);
-														})()}
+														<div className="flex flex-col">
+															<span className="flex items-center gap-1.5">
+																{isNew && (
+																	<span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0" />
+																)}
+																{new Date(sub.created_at).toLocaleDateString()}
+															</span>
+															<span
+																className={`text-[10px] ${
+																	isNew
+																		? "text-green-600/70 dark:text-green-500/70"
+																		: "text-gray-400 dark:text-zinc-500"
+																}`}
+															>
+																{new Date(sub.created_at).toLocaleTimeString()}
+															</span>
+														</div>
 													</td>
-												))}
-												{showBrowserInfo &&
-													browserKeys.map((key) => (
+													{dataKeys.map((key) => (
 														<td
-															key={`${sub.id}-browser-${key}`}
-															className="px-4 sm:px-6 py-4 sm:py-5 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50/10 dark:bg-indigo-900/5 group-hover:bg-indigo-50/30 dark:group-hover:bg-indigo-900/10 transition-colors border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[150px] sm:max-w-[200px] truncate"
+															key={`${sub.id}-data-${key}`}
+															className={`px-4 sm:px-6 py-4 sm:py-5 text-sm font-medium border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[200px] sm:max-w-[300px] truncate ${
+																isNew
+																	? "text-green-900 dark:text-green-100"
+																	: "text-gray-700 dark:text-zinc-300"
+															}`}
 															title={(() => {
-																const browserObj =
-																	typeof sub.browser_info === "object" &&
-																	sub.browser_info !== null
-																		? (sub.browser_info as Record<
-																				string,
-																				unknown
-																		  >)
+																const dataObj =
+																	typeof sub.data === "object" &&
+																	sub.data !== null
+																		? (sub.data as Record<string, unknown>)
 																		: {};
-																return String(browserObj[key] || "");
+																return String(dataObj[key] || "");
 															})()}
 														>
 															{(() => {
-																const browserObj =
-																	typeof sub.browser_info === "object" &&
-																	sub.browser_info !== null
-																		? (sub.browser_info as Record<
-																				string,
-																				unknown
-																		  >)
+																const dataObj =
+																	typeof sub.data === "object" &&
+																	sub.data !== null
+																		? (sub.data as Record<string, unknown>)
 																		: {};
-																const value = browserObj[key];
+																const value = dataObj[key];
 																return value !== null && value !== undefined ? (
-																	String(value)
+																	typeof value === "object" ? (
+																		<code
+																			className={`text-[10px] p-1 rounded font-mono truncate block ${
+																				isNew
+																					? "bg-green-100/50 dark:bg-green-950/50 text-green-800 dark:text-green-300"
+																					: "bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400"
+																			}`}
+																		>
+																			{JSON.stringify(value)}
+																		</code>
+																	) : (
+																		String(value)
+																	)
 																) : (
-																	<span className="text-indigo-200 dark:text-indigo-900">
+																	<span
+																		className={
+																			isNew
+																				? "text-green-300 dark:text-green-800"
+																				: "text-gray-300 dark:text-zinc-700"
+																		}
+																	>
 																		—
 																	</span>
 																);
 															})()}
 														</td>
 													))}
-												<td className="px-4 sm:px-6 py-4 sm:py-5 whitespace-nowrap sticky right-0 bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900 transition-colors z-20 border-l border-gray-100 dark:border-zinc-800 shadow-[-1px_0_0_rgba(0,0,0,0.05)]">
-													<div className="flex items-center gap-2 sm:gap-3">
-														{sub.ip_address && (
-															<span className="hidden sm:inline-block text-[10px] bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-mono font-bold">
-																{sub.ip_address}
-															</span>
-														)}
-														<Link
-															href={`/admin/${endpoint}/${sub.id}`}
-															className="p-2 text-gray-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
-															title="View details"
-														>
-															<Eye className="w-5 h-5 sm:w-5 sm:h-5" />
-														</Link>
-														<button
-															onClick={() => handleDelete(sub.id)}
-															className="p-2 text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
-															title="Delete entry"
-														>
-															<Trash2 className="w-5 h-5 sm:w-5 sm:h-5" />
-														</button>
-													</div>
-												</td>
-											</tr>
-										));
+													{showBrowserInfo &&
+														browserKeys.map((key) => (
+															<td
+																key={`${sub.id}-browser-${key}`}
+																className={`px-4 sm:px-6 py-4 sm:py-5 text-xs bg-opacity-10 group-hover:bg-opacity-30 transition-colors border-r border-gray-100/30 dark:border-zinc-800/30 max-w-[150px] sm:max-w-[200px] truncate ${
+																	isNew
+																		? "text-green-600 dark:text-green-400 bg-green-500/5"
+																		: "text-indigo-500 dark:text-indigo-400 bg-indigo-500/5"
+																}`}
+																title={(() => {
+																	const browserObj =
+																		typeof sub.browser_info === "object" &&
+																		sub.browser_info !== null
+																			? (sub.browser_info as Record<
+																					string,
+																					unknown
+																			  >)
+																			: {};
+																	return String(browserObj[key] || "");
+																})()}
+															>
+																{(() => {
+																	const browserObj =
+																		typeof sub.browser_info === "object" &&
+																		sub.browser_info !== null
+																			? (sub.browser_info as Record<
+																					string,
+																					unknown
+																			  >)
+																			: {};
+																	const value = browserObj[key];
+																	return value !== null &&
+																		value !== undefined ? (
+																		String(value)
+																	) : (
+																		<span
+																			className={
+																				isNew
+																					? "text-green-200 dark:text-green-900"
+																					: "text-indigo-200 dark:text-indigo-900"
+																			}
+																		>
+																			—
+																		</span>
+																	);
+																})()}
+															</td>
+														))}
+													<td
+														className={`px-4 sm:px-6 py-4 sm:py-5 whitespace-nowrap sm:sticky sm:right-0 transition-colors z-20 border-l border-gray-100 dark:border-zinc-800 sm:shadow-[-1px_0_0_rgba(0,0,0,0.05)] ${
+															isNew
+																? "bg-green-50/40 dark:bg-green-900/10 group-hover:bg-green-50/60 dark:group-hover:bg-green-900/20"
+																: "bg-white dark:bg-zinc-900 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900"
+														}`}
+													>
+														<div className="flex items-center gap-2 sm:gap-3">
+															{sub.ip_address && (
+																<span
+																	className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+																		isNew
+																			? "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400"
+																			: "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400"
+																	}`}
+																>
+																	{sub.ip_address}
+																</span>
+															)}
+															<Link
+																href={`/admin/${endpoint}/${sub.id}`}
+																className={`p-2 rounded-lg transition-all ${
+																	isNew
+																		? "text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
+																		: "text-gray-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+																}`}
+																title="View details"
+															>
+																<Eye className="w-5 h-5" />
+															</Link>
+															<button
+																onClick={() => handleDelete(sub.id)}
+																className={`p-2 rounded-lg transition-all ${
+																	isNew
+																		? "text-green-600/50 dark:text-green-400/50 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+																		: "text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+																}`}
+																title="Delete entry"
+															>
+																<Trash2 className="w-5 h-5" />
+															</button>
+														</div>
+													</td>
+												</tr>
+											);
+										});
 									})()}
 								</tbody>
 							</table>
